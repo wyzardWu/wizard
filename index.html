@@ -136,8 +136,17 @@ figure { margin: 0; }
 .slide.on { opacity: 1; transform: none; }
 .slide .clip { position: relative; aspect-ratio: 16/9; border-radius: 14px; overflow: hidden; background: #0a0f12; box-shadow: 0 30px 70px -34px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.06); cursor: pointer; }
 .slide video, .slide .clip img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-.slide .zoom { position: absolute; right: 10px; top: 10px; font: 500 .68rem/1 var(--sans); color: #fff; background: rgba(0,0,0,.55); padding: 6px 9px; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.slide .zoom { position: absolute; right: 10px; bottom: 10px; font: 500 .68rem/1 var(--sans); color: #fff; background: rgba(0,0,0,.55); padding: 6px 9px; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none; }
 .slide.on .zoom { opacity: 1; }
+/* (12-11 user: 4 ways to play 加上 proxy 的滑动) each slide plays a packed clip (video | proxy) drawn on a canvas, split by a seam */
+.slide .clip canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.slide .clip video { visibility: hidden; }
+.slide .tag { position: absolute; top: 10px; font: 500 .6rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; padding: 6px 8px; border-radius: 5px; background: rgba(0,0,0,.6); pointer-events: none; opacity: 0; transition: opacity .2s; }
+.slide .tag.l { left: 10px; color: #fff; } .slide .tag.r { right: 10px; color: var(--accent); }
+.slide .seam { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--accent); box-shadow: 0 0 12px var(--accent); pointer-events: none; opacity: 0; transition: opacity .2s; }
+.slide .knob { position: absolute; top: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid var(--accent); background: rgba(0,0,0,.45); touch-action: none; cursor: ew-resize; opacity: 0; transition: opacity .2s; }
+.slide .knob::before { content: "\2194"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--accent); font: 500 .8rem/1 var(--sans); }
+.slide.on.live .tag, .slide.on.live .seam, .slide.on.live .knob { opacity: 1; }
 .slide figcaption { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 24px; align-items: start; padding: 14px 2px 0; visibility: hidden; }
 .slide.on figcaption { visibility: visible; }
 @media (max-width: 640px) { .slide figcaption { grid-template-columns: minmax(0, 1fr); } }
@@ -318,7 +327,7 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
 <div class="zone-dark">
 <section id="capabilities">
   <div class="wrap">
-    <div class="sh"><span class="kicker">Capabilities</span><h2><b>Four</b> ways to play</h2><p>Swipe or use the arrows. Each clip comes with the inputs that made it; click it to watch large.</p></div>
+    <div class="sh"><span class="kicker">Capabilities</span><h2><b>Four</b> ways to play</h2><p>Swipe or use the arrows. Each clip comes with the inputs that made it. Move the line across a clip to see the visual proxy the model was given; click it to watch large.</p></div>
     <div class="tabs" role="tablist" id="captabs"></div>
   </div>
   <!-- (10-30 user: 参考 Genie 4 博客 "Turn on audio" 那节：居中大图、左右露出邻居、左右滑) -->
@@ -455,12 +464,29 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
   let cur = -1, seen = false;
   const slides = ALL.map((c, i) => {
     const f = document.createElement("figure"); f.className = "slide"; f.setAttribute("role", "group"); f.setAttribute("aria-roledescription", "slide"); f.setAttribute("aria-label", (i + 1) + " of " + ALL.length);
-    f.innerHTML = '<div class="clip"><img alt="" loading="lazy"><video muted playsinline preload="none"></video><span class="zoom">click to enlarge</span></div><figcaption><div><h3><small></small><b></b></h3><p class="line"></p></div></figcaption>';
+    f.innerHTML = '<div class="clip"><img alt="" loading="lazy"><video muted playsinline preload="none"></video><canvas width="832" height="468"></canvas><span class="tag l">Video</span><span class="tag r">Visual proxy</span><div class="seam"></div><div class="knob" aria-hidden="true"></div><span class="zoom">click to enlarge</span></div><figcaption><div><h3><small></small><b></b></h3><p class="line"></p></div></figcaption>';
     f.querySelector("img").src = A + "v/" + c.v + ".jpg"; f.querySelector("small").textContent = c.capT; f.querySelector("b").textContent = c.t; f.querySelector("b").style.fontWeight = "600";
     f.querySelector(".line").textContent = c.line; f.querySelector("figcaption").append(insRow(c));
     const v = f.querySelector("video");
     v.addEventListener("ended", () => go(i + 1 < ALL.length ? i + 1 : 0));
-    f.querySelector(".clip").addEventListener("click", () => { if (i !== cur) return go(i); v.pause(); openLB(c.v, c.t + ". " + c.line, () => { if (seen) v.play().catch(() => {}); }); });
+    // (12-11) the packed clip (video | proxy) is drawn split at the seam: the mouse moves it, on touch the knob drags it (a swipe elsewhere still turns the carousel)
+    const clip = f.querySelector(".clip"), cv = f.querySelector("canvas"), ctx = cv.getContext("2d"), seam = f.querySelector(".seam"), knob = f.querySelector(".knob");
+    let split = 0.5, raf = 0;
+    const setSplit = u => { split = Math.max(0, Math.min(1, u)); seam.style.left = knob.style.left = (split * 100) + "%"; };
+    const pos = e => { const r = clip.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
+    setSplit(0.5); f._clear = () => { if (raf) cancelAnimationFrame(raf); raf = 0; f.classList.remove("live"); ctx.clearRect(0, 0, 832, 468); };
+    const draw = () => { raf = 0; if (i !== cur) return; if (v.readyState >= 2) { f.classList.add("live"); const W = 832, H = 468, x = Math.round(W * split);
+        if (x > 0) ctx.drawImage(v, 0, 0, x, H, 0, 0, x, H); if (x < W) ctx.drawImage(v, W + x, 0, W - x, H, x, 0, W - x, H); }
+      if (!v.paused) raf = requestAnimationFrame(draw); };
+    v.addEventListener("play", () => { if (!raf) raf = requestAnimationFrame(draw); });
+    v.addEventListener("seeked", () => { if (!raf) raf = requestAnimationFrame(draw); });
+    clip.addEventListener("pointermove", e => { if (e.pointerType === "mouse" && i === cur) { setSplit(pos(e)); if (v.paused && !raf) raf = requestAnimationFrame(draw); } });
+    knob.addEventListener("pointerdown", e => { e.stopPropagation(); knob.setPointerCapture(e.pointerId);
+      const mv = ev => { setSplit(pos(ev)); if (v.paused && !raf) raf = requestAnimationFrame(draw); };
+      const up = () => { knob.removeEventListener("pointermove", mv); knob.removeEventListener("pointerup", up); knob.removeEventListener("pointercancel", up); };
+      knob.addEventListener("pointermove", mv); knob.addEventListener("pointerup", up); knob.addEventListener("pointercancel", up); });
+    knob.addEventListener("click", e => { e.stopPropagation(); });
+    clip.addEventListener("click", () => { if (i !== cur) return go(i); v.pause(); openLB(c.v, c.t + ". " + c.line, () => { if (seen) v.play().catch(() => {}); }); });
     car.append(f);
     const d = document.createElement("button"); d.type = "button"; d.setAttribute("aria-label", "Slide " + (i + 1)); d.addEventListener("click", () => go(i)); dots.append(d);
     return f;
@@ -468,7 +494,7 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
   function activate(i) {
     if (i === cur) return; cur = i;
     slides.forEach((f, j) => { const v = f.querySelector("video"); f.classList.toggle("on", j === i);
-      if (j === i) { if (!v.src) v.src = A + "v/" + ALL[j].v + ".mp4"; v.currentTime = 0; if (seen) v.play().catch(() => {}); } else v.pause(); });
+      if (j === i) { if (!v.src) v.src = A + "v/" + ALL[j].v + "_cmp.mp4"; v.currentTime = 0; if (seen) v.play().catch(() => {}); } else { v.pause(); if (f._clear) f._clear(); } });
     dots.querySelectorAll("button").forEach((d, j) => d.setAttribute("aria-current", String(j === i)));
     tabsEl.querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-selected", String(j === ALL[i].cap)));
   }
