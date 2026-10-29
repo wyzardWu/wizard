@@ -82,6 +82,29 @@ section { padding-top: 84px; }
 .figcap b { color: var(--ink); font-weight: 600; }
 figure { margin: 0; }
 
+/* centred-bleed carousel (Genie 4): the active slide centred, neighbours peeking and dimmed, swipe or arrows */
+.carousel { --sw: min(780px, 86vw); display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding: 4px calc((100vw - var(--sw)) / 2) 6px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.carousel::-webkit-scrollbar { display: none; }
+.slide { flex: 0 0 var(--sw); scroll-snap-align: center; margin: 0; opacity: .35; transform: scale(.94); transition: opacity .35s, transform .35s; }
+.slide.on { opacity: 1; transform: none; }
+.slide .clip { position: relative; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 0 0 1px var(--line); cursor: pointer; }
+.slide video, .slide .clip img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.slide .zoom { position: absolute; right: 10px; top: 10px; font: 500 .68rem/1 var(--sans); color: #fff; background: rgba(0,0,0,.55); padding: 6px 9px; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.slide.on .zoom { opacity: 1; }
+.slide figcaption { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 24px; align-items: start; padding: 14px 2px 0; visibility: hidden; }
+.slide.on figcaption { visibility: visible; }
+@media (max-width: 640px) { .slide figcaption { grid-template-columns: minmax(0, 1fr); } }
+.slide h3 { font: 600 1rem/1.3 var(--sans); }
+.slide h3 small { font: 500 .62rem/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-right: 10px; vertical-align: 2px; }
+.slide .line { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+.slide .ins { border-top: 0; padding-top: 0; flex-wrap: nowrap; }
+.carnav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 18px; }
+.carnav > button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line2); background: transparent; color: var(--ink); cursor: pointer; }
+.carnav > button:hover { background: var(--card); }
+.dots { display: flex; gap: 8px; }
+.dots button { width: 8px; height: 8px; padding: 0; border-radius: 50%; border: 0; background: var(--line2); cursor: pointer; transition: width .25s, background .25s; }
+.dots button[aria-current="true"] { width: 22px; border-radius: 4px; background: var(--accent); }
+
 /* capability viewer: tabs, one video, the inputs beside it */
 .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .tabs button { font: 500 .84rem/1 var(--sans); padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line2); background: transparent; color: var(--muted); cursor: pointer; display: inline-flex; gap: 7px; align-items: center; }
@@ -251,14 +274,13 @@ dialog.lb p { color: var(--muted); text-align: center; font-size: .88rem; margin
 
 <section id="capabilities">
   <div class="wrap">
-    <div class="sh"><span class="kicker">Capabilities</span><h2><b>Four</b> ways to play</h2><p>One clip at a time, with the inputs that made it. Click the video to watch it large.</p></div>
+    <div class="sh"><span class="kicker">Capabilities</span><h2><b>Four</b> ways to play</h2><p>Swipe or use the arrows. Each clip comes with the inputs that made it; click it to watch large.</p></div>
     <div class="tabs" role="tablist" id="captabs"></div>
-    <div class="viewer card" id="viewer">
-      <div class="vid"><video muted playsinline preload="none"></video><span class="hint">click to enlarge</span></div>
-      <div class="info"><div class="cases"></div><h3></h3><p class="line"></p><div class="ins"></div></div>
-    </div>
-    <div class="railbar"><span class="lab">All cases · scroll sideways</span><div class="arrows"><button type="button" id="rl" aria-label="Previous">←</button><button type="button" id="rr" aria-label="Next">→</button></div></div>
-    <div class="rail" id="rail"></div>
+  </div>
+  <!-- (10-30 user: 参考 Genie 4 博客 "Turn on audio" 那节：居中大图、左右露出邻居、左右滑) -->
+  <div class="carousel" id="car" aria-roledescription="carousel" aria-label="Capabilities"></div>
+  <div class="wrap">
+    <div class="carnav"><button type="button" id="cprev" aria-label="Previous">←</button><div class="dots" id="dots"></div><button type="button" id="cnext" aria-label="Next">→</button></div>
   </div>
 </section>
 
@@ -383,37 +405,51 @@ dialog.lb p { color: var(--muted); text-align: center; font-size: .88rem; margin
       { v: "die", t: "You died", line: "At 35% health, the knight takes one blow from the ape and falls.", ins: [["First frame", ["in/die_ff.jpg"]]], act: "hp_player → 0 · KO" } ] }
   ];
   const ALL = []; CAPS.forEach((cap, i) => cap.cases.forEach(c => ALL.push(Object.assign({ cap: i, capT: cap.t }, c))));
-  const tabsEl = $("#captabs"), vw = $("#viewer"), vv = vw.querySelector("video"), vh = vw.querySelector("h3"), vl = vw.querySelector(".line"), vi = vw.querySelector(".ins"), rail = $("#rail");
-  let cur = 0, seen = false;
+  const tabsEl = $("#captabs"), car = $("#car"), dots = $("#dots");
   function insRow(c) {
-    vi.innerHTML = "";
+    const vi = document.createElement("div"); vi.className = "ins";
     c.ins.forEach(([lab, srcs, sq]) => {
       const d = document.createElement("div"); d.innerHTML = '<span class="lab"></span><div class="row"></div>'; d.querySelector(".lab").textContent = lab;
       srcs.forEach((s, k) => { if (k) { const a = document.createElement("span"); a.className = "arr"; a.textContent = "→"; d.querySelector(".row").append(a); }
-        const im = document.createElement("img"); im.src = A + s; im.alt = lab; if (sq) im.className = "sq"; d.querySelector(".row").append(im); });
+        const im = document.createElement("img"); im.src = A + s; im.alt = lab; im.loading = "lazy"; if (sq) im.className = "sq"; d.querySelector(".row").append(im); });
       vi.append(d);
     });
     const p = document.createElement("div"); p.innerHTML = '<span class="lab">Player</span><div class="act"></div>'; p.querySelector(".act").innerHTML = c.act; vi.append(p);
+    return vi;
   }
-  function show(i, scroll) {
-    cur = i; const c = ALL[i];
-    rail.querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
-    tabsEl.querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-selected", String(j === c.cap)));
-    vv.poster = A + "v/" + c.v + ".jpg"; vv.src = A + "v/" + c.v + ".mp4"; if (seen) vv.play().catch(() => {});
-    vh.textContent = c.t; vl.textContent = c.line; insRow(c);
-    if (scroll) { const b = rail.children[i]; rail.scrollTo({ left: b.offsetLeft - rail.offsetLeft - 4, behavior: "smooth" }); }
+  let cur = -1, seen = false;
+  const slides = ALL.map((c, i) => {
+    const f = document.createElement("figure"); f.className = "slide"; f.setAttribute("role", "group"); f.setAttribute("aria-roledescription", "slide"); f.setAttribute("aria-label", (i + 1) + " of " + ALL.length);
+    f.innerHTML = '<div class="clip"><img alt="" loading="lazy"><video muted playsinline preload="none"></video><span class="zoom">click to enlarge</span></div><figcaption><div><h3><small></small><b></b></h3><p class="line"></p></div></figcaption>';
+    f.querySelector("img").src = A + "v/" + c.v + ".jpg"; f.querySelector("small").textContent = c.capT; f.querySelector("b").textContent = c.t; f.querySelector("b").style.fontWeight = "600";
+    f.querySelector(".line").textContent = c.line; f.querySelector("figcaption").append(insRow(c));
+    const v = f.querySelector("video");
+    v.addEventListener("ended", () => go(i + 1 < ALL.length ? i + 1 : 0));
+    f.querySelector(".clip").addEventListener("click", () => { if (i !== cur) return go(i); v.pause(); openLB(c.v, c.t + ". " + c.line, () => { if (seen) v.play().catch(() => {}); }); });
+    car.append(f);
+    const d = document.createElement("button"); d.type = "button"; d.setAttribute("aria-label", "Slide " + (i + 1)); d.addEventListener("click", () => go(i)); dots.append(d);
+    return f;
+  });
+  function activate(i) {
+    if (i === cur) return; cur = i;
+    slides.forEach((f, j) => { const v = f.querySelector("video"); f.classList.toggle("on", j === i);
+      if (j === i) { if (!v.src) v.src = A + "v/" + ALL[j].v + ".mp4"; v.currentTime = 0; if (seen) v.play().catch(() => {}); } else v.pause(); });
+    dots.querySelectorAll("button").forEach((d, j) => d.setAttribute("aria-current", String(j === i)));
+    tabsEl.querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-selected", String(j === ALL[i].cap)));
   }
+  function go(i) { const f = slides[i]; car.scrollTo({ left: f.offsetLeft - (car.clientWidth - f.offsetWidth) / 2, behavior: "smooth" }); activate(i); }
+  // the slide nearest the centre becomes active when the user swipes
+  let st = 0; car.addEventListener("scroll", () => { clearTimeout(st); st = setTimeout(() => {
+    const mid = car.scrollLeft + car.clientWidth / 2; let best = 0, bd = 1e9;
+    slides.forEach((f, j) => { const d = Math.abs(f.offsetLeft + f.offsetWidth / 2 - mid); if (d < bd) { bd = d; best = j; } }); activate(best); }, 90); });
   CAPS.forEach((c, i) => { const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.innerHTML = "<small>0" + (i + 1) + "</small>"; b.append(c.t);
-    b.addEventListener("click", () => show(ALL.findIndex(x => x.cap === i), true)); tabsEl.append(b); });
-  ALL.forEach((c, i) => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = '<img alt="" loading="lazy"><span><small></small><b></b></span>';
-    b.querySelector("img").src = A + "v/" + c.v + ".jpg"; b.querySelector("small").textContent = c.capT; b.querySelector("b").textContent = c.t; b.querySelector("b").style.fontWeight = "500";
-    b.addEventListener("click", () => show(i, false)); rail.append(b); });
-  $("#rl").addEventListener("click", () => rail.scrollBy({ left: -rail.clientWidth * 0.8, behavior: "smooth" }));
-  $("#rr").addEventListener("click", () => rail.scrollBy({ left: rail.clientWidth * 0.8, behavior: "smooth" }));
-  vv.addEventListener("ended", () => show((cur + 1) % ALL.length, true));
-  show(0, false);
-  vv.addEventListener("click", () => { const c = ALL[cur]; vv.pause(); openLB(c.v, c.t + ". " + c.line, () => { if (seen) vv.play().catch(() => {}); }); });
-  whenSeen(vw, () => { seen = true; vv.play().catch(() => {}); }, () => vv.pause());
+    b.addEventListener("click", () => go(ALL.findIndex(x => x.cap === i))); tabsEl.append(b); });
+  $("#cprev").addEventListener("click", () => go((cur - 1 + ALL.length) % ALL.length));
+  $("#cnext").addEventListener("click", () => go((cur + 1) % ALL.length));
+  car.addEventListener("keydown", e => { if (e.key === "ArrowRight") go((cur + 1) % ALL.length); if (e.key === "ArrowLeft") go((cur - 1 + ALL.length) % ALL.length); });
+  car.tabIndex = 0;
+  requestAnimationFrame(() => { car.scrollLeft = 0; activate(0); });
+  whenSeen(car, () => { seen = true; const v = slides[cur] && slides[cur].querySelector("video"); if (v) v.play().catch(() => {}); }, () => slides.forEach(f => f.querySelector("video").pause()));
 
   // ---------- drag-to-compare screen over a packed clip (video | proxy)
   function Screen(el) {
