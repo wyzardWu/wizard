@@ -1,172 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wizard World Model</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Wizard: manipulate any world in real time via agentic control.">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,300;125,500;125,700&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a dim projection hall in cold graphite fog (Nolan: steel, slate, film black), one reel per idea and a lot of dark around each.
-   Order follows the paper: overview -> four ways to play -> gameplay rules -> two properties -> how it works -> data.
-   Expanded wide-tracked capitals for titles, a quiet grotesk for reading, cyan only where the state shows through. */
+/* (10-29 user: 参考 Genie 4 和混元的项目页，提高审美；下面的 case 太大)
+   Genie 4: sticky jump links, short left-aligned section headers with the explanation beside them, rounded media.
+   Hunyuan: dark gallery, compact two-column cards, small gaps. Big media only for the trailer; a click opens any case large. */
 :root {
-  --night: #171b21;        /* ground: lifted slate, never pure black */
-  --haze: rgba(32,37,45,.62);         /* raised panels */
-  --mist: rgba(170,182,196,.16);         /* hairlines */
-  --violet: #7c8796;       /* slate fog (was deep purple) */
-  --cyan: #a7c4c9;         /* the state showing through */
-  --text: #ecebe7;
-  --dim: #9ba1a8;
+  --night: #12151a; --card: #1a1e25; --card2: #20252d;
+  --line: rgba(170,182,196,.14); --line2: rgba(170,182,196,.26);
+  --cyan: #a7c4c9; --gold: #ecc45e; --text: #ecebe7; --dim: #9aa1aa; --faint: #6d747d;
   --f-title: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --f-body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
-  --s-1: .8125rem; --s0: 1rem; --s1: 1.125rem; --s3: clamp(1.5rem, 3vw, 2.15rem); --s4: clamp(2.2rem, 6vw, 4.6rem);
-  --gap: clamp(120px, 16vw, 210px);
+  --r: 14px; --max: 1080px; --sec: clamp(72px, 9vw, 112px);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: linear-gradient(178deg, #222831 0%, #1a1f26 22%, #171b21 48%, #191b20 74%, #1d1c1f 100%) fixed, var(--night); color: var(--text); font: 400 var(--s0)/1.7 var(--f-body); -webkit-font-smoothing: antialiased; }
-body::after { content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none;
-  background: radial-gradient(60% 34% at 50% -4%, rgba(206,216,228,.16), transparent 72%),
-              radial-gradient(42% 34% at 8% 30%, rgba(142,120,150,.13), transparent 70%),
-              radial-gradient(40% 32% at 94% 58%, rgba(104,146,150,.12), transparent 70%),
-              radial-gradient(55% 30% at 30% 86%, rgba(176,146,112,.07), transparent 72%),
-              radial-gradient(70% 40% at 60% 112%, rgba(120,132,152,.12), transparent 70%);
-  animation: drift 45s ease-in-out infinite alternate; }
-body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-@keyframes drift { to { transform: translate3d(3%, -2%, 0) scale(1.05); } }
-@media (prefers-reduced-motion: reduce) { body::after { animation: none; } }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body { margin: 0; background: var(--night); color: var(--text); font: 400 1rem/1.65 var(--f-body); -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(70% 45% at 50% -8%, rgba(120,140,190,.20), transparent 70%),
+              radial-gradient(40% 30% at 0% 40%, rgba(142,120,170,.08), transparent 70%),
+              radial-gradient(40% 30% at 100% 70%, rgba(104,146,150,.07), transparent 70%); }
 a { color: var(--cyan); text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
-.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-h1, h2, h3 { margin: 0; text-wrap: balance; }
-p { margin: 0; }
-.kicker { font: 500 .7rem/1 var(--f-mono); letter-spacing: .3em; text-transform: uppercase; color: var(--cyan); }
-.title { font: 300 var(--s3)/1.2 var(--f-title); font-stretch: 125%; letter-spacing: .24em; text-transform: uppercase; }
-.title b { font-weight: 700; }
-.lead { color: var(--dim); font-size: var(--s1); line-height: 1.65; max-width: 58ch; }
+img, video { max-width: 100%; }
+h1, h2, h3, p { margin: 0; }
+h2, h3 { text-wrap: balance; }
+.wrap { max-width: var(--max); margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+.kicker { font: 500 .7rem/1 var(--f-mono); letter-spacing: .26em; text-transform: uppercase; color: var(--cyan); }
+
+/* sticky bar: wordmark + jump links (Genie 4) */
+.bar { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  background: rgba(18,21,26,.72); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); flex: none; }
+.brand img { width: 30px; height: 30px; object-fit: contain; }
+.brand b { font: 700 .82rem/1 var(--f-title); font-stretch: 125%; letter-spacing: .28em; }
+.jump { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-left: auto; }
+.jump::-webkit-scrollbar { display: none; }
+.jump a { flex: none; font: 500 .8rem/1 var(--f-body); color: var(--dim); text-decoration: none; padding: 8px 12px; border-radius: 999px; }
+.jump a:hover { color: var(--text); background: var(--card); }
+.jump a.on { color: var(--night); background: var(--text); }
+@media (max-width: 640px) { .brand b { display: none; } .bar .wrap { gap: 10px; } }
 
 /* hero */
-.hero { padding-block: 72px 0; text-align: center; }
-.hero h1 { font: 700 var(--s4)/1 var(--f-title); font-stretch: 125%; letter-spacing: .36em; padding-left: .36em; margin-top: 22px; }
-.hero .sub { font: 300 var(--s1)/1.4 var(--f-title); font-stretch: 125%; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); margin-top: 20px; }
-.authors { margin-top: 36px; display: grid; gap: 6px; justify-items: center; }
-.authors .names { font-size: var(--s1); }
-.authors .names span + span::before { content: "·"; margin: 0 .8em; color: var(--dim); }
-.authors sup { color: var(--cyan); font-size: .68em; margin-left: 1px; }
-.authors .aff, .authors .notes { font-size: var(--s-1); color: var(--dim); }
-.btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 30px; }
-.btn { font: 500 .76rem/1 var(--f-mono); letter-spacing: .08em; padding: 10px 16px; border: 1px solid var(--mist); color: var(--text); text-decoration: none; background: rgba(21,24,29,.6); }
-.btn.hot { border-color: var(--cyan); color: var(--cyan); }
-.btn[aria-disabled="true"] { color: var(--dim); }
-.btn[aria-disabled="true"] small { opacity: .7; margin-left: 6px; }
-.film { position: relative; margin-top: 64px; aspect-ratio: 16/9; max-width: 100%; background: #000; overflow: hidden; box-shadow: 0 0 0 1px var(--mist), 0 50px 140px -50px rgba(0,0,0,.75); }
-.film video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.chip { position: absolute; right: 12px; bottom: 12px; font: 500 .74rem/1 var(--f-mono); padding: 8px 12px; border: 1px solid var(--mist); background: rgba(11,13,16,.7); color: var(--text); cursor: pointer; }
-.facts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 56px; }
-.fact { padding: 4px 16px; border-left: 1px solid var(--mist); display: grid; gap: 6px; text-align: left; }
-.fact:first-child { border-left: 0; padding-left: 0; }
-.fact b { font: 300 var(--s3)/1 var(--f-title); font-stretch: 125%; font-variant-numeric: tabular-nums; }
-.fact span { font-size: var(--s-1); color: var(--dim); line-height: 1.45; }
-@media (max-width: 760px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; } .fact { border-left: 0; padding-left: 0; } .fact:last-child { grid-column: 1 / -1; } }
+.hero { padding-block: 56px 0; text-align: center; }
+.mascot { width: 150px; height: auto; display: block; margin: 0 auto 6px; filter: drop-shadow(0 10px 30px rgba(110,140,255,.35)); animation: bob 5s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-6px); } }
+.hero h1 { font: 700 clamp(2.4rem, 6.4vw, 4.6rem)/1 var(--f-title); font-stretch: 125%; letter-spacing: .3em; padding-left: .3em; margin-top: 18px; }
+.hero .sub { font: 300 clamp(.82rem, 1.5vw, 1.05rem)/1.5 var(--f-title); font-stretch: 125%; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin-top: 18px; }
+.authors { margin-top: 28px; display: grid; gap: 4px; justify-items: center; }
+.authors .names { font-size: 1.08rem; }
+.authors .names span { white-space: nowrap; }
+.authors .names span + span::before { content: "·"; margin: 0 .8em; color: var(--faint); }
+.authors sup { color: var(--cyan); font-size: .66em; margin-left: 1px; }
+.authors .aff, .authors .notes { font-size: .84rem; color: var(--dim); }
+.btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 500 .84rem/1 var(--f-body); padding: 11px 18px; border-radius: 999px; border: 1px solid var(--line2); color: var(--text); text-decoration: none; background: var(--card); }
+.btn small { font-size: .72rem; color: var(--faint); }
+.btn.hot { background: var(--text); color: var(--night); border-color: var(--text); }
+.btn.hot:hover { background: #fff; }
+.film { margin-top: 44px; aspect-ratio: 16/9; border-radius: 18px; overflow: hidden; background: #000; box-shadow: 0 0 0 1px var(--line), 0 40px 120px -40px rgba(0,0,0,.8); }
+.film video { width: 100%; height: 100%; display: block; object-fit: cover; }
+.facts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+.fact { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; text-align: left; display: grid; gap: 2px; }
+.fact b { font: 500 1.5rem/1.1 var(--f-title); font-stretch: 125%; font-variant-numeric: tabular-nums; }
+.fact span { font-size: .78rem; color: var(--dim); line-height: 1.4; }
+@media (max-width: 760px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fact:last-child { grid-column: 1 / -1; } }
 
-/* reels */
-section { padding-top: var(--gap); }
-.head { display: grid; gap: 18px; margin-bottom: 44px; }
-.paper { background: #f1f1ef; padding: 16px; max-width: 100%; }
-.paper img { display: block; width: 100%; height: auto; }
-.cap { font-size: var(--s-1); color: var(--dim); margin-top: 14px; max-width: 84ch; }
+/* section header: title left, explanation right (Genie 4) */
+section { padding-top: var(--sec); }
+.head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 12px 48px; align-items: end; margin-bottom: 28px; }
+.head .kicker { grid-column: 1 / -1; }
+.head h2 { font: 300 clamp(1.35rem, 2.6vw, 1.95rem)/1.2 var(--f-title); font-stretch: 125%; letter-spacing: .14em; text-transform: uppercase; }
+.head h2 b { font-weight: 700; }
+.head p { color: var(--dim); font-size: .98rem; line-height: 1.65; }
+@media (max-width: 820px) { .head { grid-template-columns: minmax(0, 1fr); } }
 
-/* case player: one case at a time, its inputs beside it */
-.case { display: grid; grid-template-columns: minmax(0, 1fr) 248px; gap: 28px; align-items: start; }
-@media (max-width: 900px) { .case { grid-template-columns: minmax(0, 1fr); } }
-.case .clip { aspect-ratio: 16/9; max-width: 100%; background: var(--haze); overflow: hidden; box-shadow: 0 0 0 1px var(--mist); }
-.case video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.case .line { margin-top: 14px; font-size: var(--s-1); color: var(--dim); min-height: 1.5em; }
-.case .line b { color: var(--text); font-weight: 500; }
-.side { display: grid; gap: 22px; }
-.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 28px; align-items: start; }
-@media (max-width: 760px) { .duo { grid-template-columns: minmax(0, 1fr); } }
-.duo figure { margin: 0; min-width: 0; display: grid; gap: 14px; }
-.duo .clip { aspect-ratio: 16/9; max-width: 100%; background: var(--haze); overflow: hidden; box-shadow: 0 0 0 1px var(--mist); }
-.duo video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.duo figcaption { display: grid; gap: 14px; }
-.duo .line { font-size: var(--s-1); color: var(--dim); }
-.duo .line b { color: var(--text); font-weight: 500; }
-.duo .ins { grid-auto-flow: column; justify-content: start; gap: 22px; }
-.duo .ins img { height: 56px; }
-.duo .ins img.sq { width: 56px; }
-.ins { display: grid; gap: 14px; }
-.ins .lab { font: 500 .66rem/1 var(--f-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--dim); margin-bottom: 7px; display: block; }
-.ins .row { display: flex; gap: 8px; align-items: center; }
-.ins img { display: block; height: 72px; width: auto; max-width: 100%; box-shadow: 0 0 0 1px var(--mist); background: #cfcfd3; }
-.ins img.sq { width: 72px; object-fit: cover; }
-.ins .arr { color: var(--dim); font-family: var(--f-mono); }
-.ins .act { font: 400 .78rem/1.5 var(--f-mono); color: var(--cyan); }
-.key { display: inline-block; font: 500 .68rem/1 var(--f-mono); padding: 4px 6px; border: 1px solid var(--mist); border-bottom-width: 2px; border-radius: 3px; color: var(--text); background: var(--haze); margin: 0 3px 3px 0; }
-.tabs { display: grid; gap: 2px; border-top: 1px solid var(--mist); padding-top: 14px; }
-.tabs button { text-align: left; background: none; border: 0; padding: 6px 0; color: var(--dim); cursor: pointer; font: 400 var(--s-1)/1.3 var(--f-body); display: flex; gap: 12px; }
-.tabs button small { font-family: var(--f-mono); color: var(--mist); }
-.tabs button[aria-pressed="true"] { color: var(--text); }
-.tabs button[aria-pressed="true"] small { color: var(--cyan); }
-@media (max-width: 900px) { .side { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
-@media (max-width: 520px) { .side { grid-template-columns: minmax(0, 1fr); } }
+/* case cards (Hunyuan-style gallery) */
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 720px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+.card { margin: 0; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; display: flex; flex-direction: column; transition: border-color .2s, transform .2s; }
+.card:hover { border-color: var(--line2); transform: translateY(-2px); }
+.card .clip { position: relative; aspect-ratio: 16/9; background: #000; cursor: zoom-in; }
+.card video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card .zoom { position: absolute; right: 10px; top: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(10,12,16,.6); border: 1px solid var(--line2); display: grid; place-items: center; opacity: 0; transition: opacity .2s; }
+.card .clip:hover .zoom { opacity: 1; }
+.card .zoom svg { width: 14px; height: 14px; stroke: var(--text); fill: none; stroke-width: 2; }
+.card figcaption { padding: 14px 16px 16px; display: grid; gap: 10px; flex: 1; }
+.card h3 { font: 600 .98rem/1.3 var(--f-body); }
+.card .line { color: var(--dim); font-size: .86rem; line-height: 1.55; }
+.ins { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); }
+.ins > div { display: grid; gap: 5px; }
+.ins .lab { font: 500 .6rem/1 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
+.ins .row { display: flex; align-items: center; gap: 6px; }
+.ins img { display: block; height: 40px; width: auto; border-radius: 5px; box-shadow: 0 0 0 1px var(--line2); background: #cfcfd3; }
+.ins img.sq { width: 40px; object-fit: cover; }
+.ins .arr { color: var(--faint); font: .8rem var(--f-mono); }
+.ins .act { font: 400 .74rem/1.6 var(--f-mono); color: var(--cyan); }
+.key { display: inline-block; font: 500 .66rem/1 var(--f-mono); padding: 4px 6px; border: 1px solid var(--line2); border-bottom-width: 2px; border-radius: 4px; color: var(--text); background: var(--card2); margin-right: 2px; }
 
-/* screens: drag-to-compare over a packed clip (video | proxy) */
-.screen { position: relative; aspect-ratio: 832/468; max-width: 100%; background: #000 center/cover no-repeat; overflow: hidden; box-shadow: 0 0 0 1px var(--mist), 0 34px 100px -46px rgba(167,196,201,.35); touch-action: pan-y; user-select: none; }
+/* reshape: interactive screen + spell list */
+.lab2 { font: 500 .6rem/1 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--faint); display: block; margin-bottom: 8px; }
+.play { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 18px; align-items: start; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; }
+@media (max-width: 860px) { .play { grid-template-columns: minmax(0, 1fr); } }
+.screen { position: relative; aspect-ratio: 832/468; border-radius: 10px; background: #000 center/cover no-repeat; overflow: hidden; touch-action: pan-y; user-select: none; }
 .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.screen .tag { position: absolute; top: 12px; font: 500 .66rem/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; padding: 6px 8px; background: rgba(11,13,16,.7); pointer-events: none; }
-.screen .tag.l { left: 12px; } .screen .tag.r { right: 12px; color: var(--cyan); }
+.screen .tag { position: absolute; top: 10px; font: 500 .62rem/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; padding: 6px 8px; border-radius: 6px; background: rgba(11,13,16,.7); pointer-events: none; }
+.screen .tag.l { left: 10px; } .screen .tag.r { right: 10px; color: var(--cyan); }
 .screen .seam { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--cyan); box-shadow: 0 0 14px var(--cyan); pointer-events: none; }
 .screen .seam::after { content: ""; position: absolute; top: 50%; left: 0; width: 26px; height: 26px; transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid var(--cyan); background: rgba(11,13,16,.55); }
 .screen[data-mode="still"] canvas, .screen[data-mode="still"] .seam, .screen[data-mode="still"] .tag,
 .screen[data-mode="video"] .seam, .screen[data-mode="video"] .tag,
 .screen[data-mode="state"] .seam, .screen[data-mode="state"] .tag.l { display: none; }
-.say { position: absolute; left: 12px; bottom: 12px; right: 12px; font: 400 .78rem/1.4 var(--f-mono); }
-.say span { display: inline-block; max-width: 100%; background: rgba(11,13,16,.78); border: 1px solid var(--mist); padding: 8px 10px; }
+.say { position: absolute; left: 10px; bottom: 10px; right: 10px; font: 400 .76rem/1.4 var(--f-mono); }
+.say span { display: inline-block; max-width: 100%; background: rgba(11,13,16,.8); border: 1px solid var(--line2); border-radius: 8px; padding: 8px 10px; }
 .say i { color: var(--cyan); font-style: normal; margin-right: 6px; }
 .worlds { display: flex; gap: 8px; margin-bottom: 14px; }
-.worlds button, .spell { background: rgba(21,24,29,.55); border: 1px solid var(--mist); color: var(--text); cursor: pointer; font: inherit; }
-.worlds button { padding: 0; width: 96px; }
-.worlds button img { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; opacity: .5; }
-.worlds button span { display: block; font: 500 .66rem/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; padding: 6px; color: var(--dim); text-align: left; }
+.worlds button { padding: 0; width: 92px; background: var(--card2); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; color: var(--text); cursor: pointer; }
+.worlds button img { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+.worlds button span { display: block; font: 500 .62rem/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; padding: 6px; color: var(--dim); text-align: left; }
 .worlds button[aria-pressed="true"] { border-color: var(--cyan); }
-.worlds button[aria-pressed="true"] img { opacity: 1; }
 .worlds button[aria-pressed="true"] span { color: var(--cyan); }
 .spells { display: grid; gap: 6px; }
-.spell { display: grid; gap: 4px; text-align: left; padding: 10px 12px; }
-.spell:hover { border-color: var(--violet); }
-.spell[aria-pressed="true"] { border-color: var(--cyan); background: rgba(167,196,201,.06); }
-.spell b { font: 500 .82rem/1.2 var(--f-title); font-stretch: 125%; letter-spacing: .1em; text-transform: uppercase; }
-.spell code { font: 400 .7rem/1.3 var(--f-mono); color: var(--cyan); opacity: .8; }
-.spell em { font: 400 .64rem/1 var(--f-mono); font-style: normal; color: var(--dim); }
-@media (max-width: 900px) { .spells { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+.spell { display: grid; gap: 3px; text-align: left; padding: 9px 12px; background: var(--card2); border: 1px solid var(--line); border-radius: 10px; color: var(--text); cursor: pointer; font: inherit; }
+.spell:hover { border-color: var(--line2); }
+.spell[aria-pressed="true"] { border-color: var(--cyan); background: rgba(167,196,201,.07); }
+.spell b { font: 600 .84rem/1.2 var(--f-body); }
+.spell code { font: 400 .68rem/1.3 var(--f-mono); color: var(--cyan); opacity: .85; }
+@media (max-width: 860px) { .spells { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+.note { margin-top: 12px; font-size: .82rem; color: var(--faint); }
 
-
-/* method + data */
-.parts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 48px; margin-top: 48px; }
+/* figures, method, data */
+.paper { background: #f3f3f1; border-radius: var(--r); padding: 14px; }
+.paper img { display: block; width: 100%; height: auto; border-radius: 6px; }
+.parts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
 @media (max-width: 760px) { .parts { grid-template-columns: minmax(0, 1fr); } }
-.parts h3 { font: 500 .9rem/1.3 var(--f-title); font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
-.parts h3 small { color: var(--cyan); margin-right: 8px; font-family: var(--f-mono); letter-spacing: 0; }
-.parts p { color: var(--dim); }
-.eq { margin-top: 36px; padding: 14px 16px; font: 400 .88rem/1.6 var(--f-mono); border-left: 1px solid var(--cyan); background: rgba(21,24,29,.5); overflow-x: auto; white-space: nowrap; }
-.tbl { overflow-x: auto; margin-top: 36px; }
-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: var(--s-1); }
-th, td { padding: 11px 14px 11px 0; text-align: left; border-bottom: 1px solid var(--mist); }
-th { font: 500 .66rem/1.2 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.parts > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+.parts h3 { font: 600 .95rem/1.3 var(--f-body); margin-bottom: 6px; }
+.parts h3 small { color: var(--cyan); margin-right: 8px; font: 500 .74rem var(--f-mono); }
+.parts p { color: var(--dim); font-size: .9rem; }
+.eq { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font: 400 .86rem/1.6 var(--f-mono); border: 1px solid var(--line); background: var(--card); overflow-x: auto; white-space: nowrap; }
+.gapv { height: 48px; }
+.tbl { overflow-x: auto; margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 18px; }
+table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: .88rem; }
+th, td { padding: 11px 14px 11px 0; text-align: left; border-bottom: 1px solid var(--line); }
+th { font: 500 .62rem/1.2 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
 td.n { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; padding-right: 0; }
 td:not(.n) { color: var(--dim); } td:first-child { color: var(--text); }
-tbody tr:last-child td { border-bottom: 0; color: var(--text); }
-ul.lim { margin: 0; padding-left: 1.1em; display: grid; gap: 12px; color: var(--dim); max-width: 64ch; }
+tbody tr:last-child td { border-bottom: 0; color: var(--text); font-weight: 600; }
+ul.lim { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; color: var(--dim); max-width: 70ch; }
 .more { display: flex; justify-content: center; }
-.more a { font: 300 var(--s1)/1 var(--f-title); font-stretch: 125%; letter-spacing: .24em; text-transform: uppercase; text-decoration: none; color: var(--text); padding: 22px 30px; border: 1px solid var(--mist); }
-.more a:hover { border-color: var(--cyan); color: var(--cyan); }
-pre { margin: 0; padding: 18px; background: rgba(21,24,29,.6); border: 1px solid var(--mist); overflow-x: auto; font: 400 .8rem/1.6 var(--f-mono); }
-.bibbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
-footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid var(--mist); color: var(--dim); font-size: var(--s-1); }
-</style>
+pre { margin: 0; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; font: 400 .8rem/1.6 var(--f-mono); }
+.bibbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.copy { font: 500 .76rem/1 var(--f-body); padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line2); background: var(--card); color: var(--text); cursor: pointer; }
+footer { margin-top: var(--sec); padding-block: 28px 48px; border-top: 1px solid var(--line); color: var(--faint); font-size: .84rem; }
+footer .wrap { display: flex; align-items: center; gap: 10px; }
+footer img { width: 26px; height: 26px; object-fit: contain; }
 
-<header class="hero">
+/* lightbox */
+dialog.lb { border: 0; padding: 0; background: transparent; max-width: min(1280px, 94vw); width: 94vw; }
+dialog.lb::backdrop { background: rgba(5,6,8,.86); backdrop-filter: blur(4px); }
+dialog.lb video { width: 100%; display: block; border-radius: 12px; background: #000; }
+dialog.lb button { position: absolute; top: -44px; right: 0; font: 500 .8rem/1 var(--f-body); padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line2); background: var(--card); color: var(--text); cursor: pointer; }
+dialog.lb p { color: var(--dim); font-size: .9rem; margin-top: 12px; text-align: center; }
+
+/* reveal on scroll */
+.rv { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
+.rv.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } .mascot { animation: none; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<nav class="bar" aria-label="Sections">
   <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/img/favicon.png" alt=""><b>WIZARD</b></a>
+    <div class="jump">
+      <a href="#overview">Overview</a><a href="#explore">Explore</a><a href="#summon">Summon</a><a href="#transform">Transform</a><a href="#reshape">Reshape</a><a href="#mechanics">Combat</a><a href="#method">Method</a><a href="#data">Data</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <img class="mascot" src="assets/img/mascot.png" alt="Wizard mascot: a small wizard holding a world block and a star staff" width="150" height="144">
     <span class="kicker">Agentic game world model</span>
     <h1>WIZARD</h1>
     <p class="sub">Manipulate any world in real time via agentic control</p>
@@ -176,12 +203,12 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
       <p class="notes">* Equal contribution&nbsp;&nbsp;&nbsp;♢ Corresponding author and project leader</p>
     </div>
     <div class="btns">
-      <span class="btn" aria-disabled="true">Paper<small>soon</small></span>
-      <span class="btn" aria-disabled="true">arXiv<small>soon</small></span>
-      <span class="btn" aria-disabled="true">Code<small>soon</small></span>
+      <span class="btn" aria-disabled="true">Paper <small>soon</small></span>
+      <span class="btn" aria-disabled="true">arXiv <small>soon</small></span>
+      <span class="btn" aria-disabled="true">Code <small>soon</small></span>
       <a class="btn hot" href="gallery.html">All results →</a>
     </div>
-    <div class="film" id="film">
+    <div class="film">
       <video id="trailer" src="assets/v/trailer.mp4" poster="assets/v/trailer.jpg" controls playsinline preload="metadata"></video>
     </div>
     <div class="facts">
@@ -194,69 +221,68 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
   </div>
 </header>
 
+<main>
 <section id="overview">
   <div class="wrap">
-    <div class="head">
+    <div class="head rv">
       <span class="kicker">Overview</span>
-      <h2 class="title"><b>One image</b> in. A world you can play.</h2>
-      <p class="lead">Wizard keeps the game state explicit: scene geometry for the world, an articulated skeleton for every character, and rules for the fight. Agents edit that state; a causal video model paints it at 24 FPS. Every scene and character below is new to the model.</p>
+      <h2><b>One image</b> in. A world you can play.</h2>
+      <p>Wizard keeps the game state explicit: scene geometry for the world, an articulated skeleton for every character, and rules for the fight. Agents edit that state; a causal video model paints it at 24 FPS. Every scene and character below is new to the model.</p>
     </div>
-    <div class="paper"><img src="assets/img/fig1.jpg" alt="Overview: world exploration, character summoning, character transformation and scene manipulation, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay." loading="lazy"></div>
+    <div class="paper rv"><img src="assets/img/fig1.jpg" alt="Overview: world exploration, character summoning, character transformation and scene manipulation, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay." loading="lazy"></div>
   </div>
 </section>
 
 <section id="explore">
   <div class="wrap">
-    <div class="head">
+    <div class="head rv">
       <span class="kicker">01 · Explore</span>
-      <h2 class="title"><b>Walk</b> beyond the picture</h2>
-      <p class="lead">The scene image becomes editable 3D geometry. Keys drive the skeleton, the mouse drives the camera, and the terrain extends past the edge of the input view.</p>
+      <h2><b>Walk</b> beyond the picture</h2>
+      <p>The scene image becomes editable 3D geometry. Keys drive the skeleton, the mouse drives the camera, and the terrain extends past the edge of the input view.</p>
     </div>
-    <div class="case" data-set="explore"></div>
+    <div class="cards" data-set="explore"></div>
   </div>
 </section>
 
 <section id="summon">
   <div class="wrap">
-    <div class="head">
+    <div class="head rv">
       <span class="kicker">02 · Summon</span>
-      <h2 class="title"><b>Any picture</b> becomes a boss</h2>
-      <p class="lead">Drop in one image of a creature. Within minutes it is segmented, lifted to a mesh, rigged, and given moves that fit its body and style. Then it walks into your world and fights, looking like its picture.</p>
+      <h2><b>Any picture</b> becomes a boss</h2>
+      <p>Drop in one image of a creature. Within minutes it is segmented, lifted to a mesh, rigged, and given moves that fit its body and style. Then it walks into your world and fights, looking like its picture.</p>
     </div>
-    <div class="duo" data-set="summon"></div>
+    <div class="cards" data-set="summon"></div>
   </div>
 </section>
 
 <section id="transform">
   <div class="wrap">
-    <div class="head">
+    <div class="head rv">
       <span class="kicker">03 · Transform</span>
-      <h2 class="title"><b>Turn</b> one thing into another</h2>
-      <p class="lead">A new picture rigs a new body that keeps the old one's place, heading and health. The old identity is masked out of the cache, so the change is instant and the scene stays.</p>
+      <h2><b>Turn</b> one thing into another</h2>
+      <p>A new picture rigs a new body that keeps the old one's place, heading and health. The old identity is masked out of the cache, so the change is instant and the scene stays.</p>
     </div>
-    <div class="duo" data-set="transform"></div>
+    <div class="cards" data-set="transform"></div>
   </div>
 </section>
 
 <section id="reshape">
   <div class="wrap">
-    <div class="head">
+    <div class="head rv">
       <span class="kicker">04 · Reshape</span>
-      <h2 class="title"><b>Choose</b> how the world changes</h2>
-      <p class="lead">Pick a spell. The world agent writes a short program over geometric operators, the geometry changes, and the next proxy frame carries it. Drag across the frame to see the proxy.</p>
+      <h2><b>Choose</b> how the world changes</h2>
+      <p>Pick a spell. The world agent writes a short program over geometric operators, the geometry changes, and the next proxy frame carries it. Drag across the frame to compare the video with its proxy.</p>
     </div>
-    <div class="case">
-      <div>
-        <div class="screen" id="world" data-mode="still" role="group" aria-label="Scene">
-          <canvas width="832" height="468"></canvas>
-          <span class="tag l">Video</span><span class="tag r">Visual proxy</span>
-          <div class="seam" style="left:50%"></div>
-          <div class="say"><span id="say"><i>›</i>choose a spell</span></div>
-        </div>
+    <div class="play rv">
+      <div class="screen" id="world" data-mode="still" role="group" aria-label="Scene">
+        <canvas width="832" height="468"></canvas>
+        <span class="tag l">Video</span><span class="tag r">Visual proxy</span>
+        <div class="seam" style="left:50%"></div>
+        <div class="say"><span id="say"><i>›</i>choose a spell</span></div>
       </div>
-      <div class="side">
-        <div><span class="ins"><span class="lab">First frame</span></span><div class="worlds" id="worlds"></div></div>
-        <div><span class="ins"><span class="lab">Spell</span></span><div class="spells" id="spells"></div></div>
+      <div>
+        <span class="lab2">First frame</span><div class="worlds" id="worlds"></div>
+        <span class="lab2">Spell</span><div class="spells" id="spells"></div>
       </div>
     </div>
   </div>
@@ -264,33 +290,33 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
 
 <section id="mechanics">
   <div class="wrap">
-    <div class="head">
+    <div class="head rv">
       <span class="kicker">05 · Play by the rules</span>
-      <h2 class="title"><b>The state</b> decides who wins</h2>
-      <p class="lead">A planner picks each boss move from its own motion set; a rule-based controller checks swept hitboxes, dodges and cooldowns, and applies damage. Health, hits and the final blow come from the simulation, and the model renders them.</p>
+      <h2><b>The state</b> decides who wins</h2>
+      <p>A planner picks each boss move from its own motion set; a rule-based controller checks swept hitboxes, dodges and cooldowns, and applies damage. Health, hits and the final blow come from the simulation, and the model renders them.</p>
     </div>
-    <div class="case" data-set="mechanics"></div>
+    <div class="cards" data-set="mechanics"></div>
   </div>
 </section>
 
 <section id="method">
   <div class="wrap">
-    <div class="head">
+    <div class="head rv">
       <span class="kicker">How it works</span>
-      <h2 class="title"><b>Agents</b> keep the state. <b>The model</b> paints it.</h2>
-      <p class="lead">A setup stage of under five minutes reconstructs the scene and characters, rigs skeletons and builds each character's motion set. During play, the framework updates motion, geometry and combat state, and the generator renders them.</p>
+      <h2><b>Agents</b> keep the state. <b>The model</b> paints it.</h2>
+      <p>A setup stage of under five minutes reconstructs the scene and characters, rigs skeletons and builds each character's motion set. During play, the framework updates motion, geometry and combat state, and the generator renders them.</p>
     </div>
-    <div class="paper"><img src="assets/img/fig3.jpg" alt="Inference pipeline: (a) character animation, (b) scene manipulation, (c) state-aware combat control, (d) real-time video generation." loading="lazy"></div>
-    <div class="parts">
+    <div class="paper rv"><img src="assets/img/fig3.jpg" alt="Inference pipeline: (a) character animation, (b) scene manipulation, (c) state-aware combat control, (d) real-time video generation." loading="lazy"></div>
+    <div class="parts rv">
       <div><h3><small>(a)</small>Character animation</h3><p>Qwen3-VL infers each character's body structure; SAM2, TripoSG and UniRig turn it into a labelled skeleton. Motions from CombatMotion, WildWorld and Elden Ring are retrieved by compatible body structure and VLM-judged style, then retargeted limb chain by limb chain.</p></div>
       <div><h3><small>(b)</small>Scene manipulation</h3><p>MoGe-2 recovers geometry and camera. An OpenGL renderer draws the proxy, and Qwen3-VL-8B turns instructions into programs over geometric operators, from raising a platform to turning the world upside down.</p></div>
       <div><h3><small>(c)</small>State-aware combat control</h3><p>The state tracks positions, poses, health, action phases and cooldowns. The planner simulates candidate attacks against the player's geometry; the controller resolves hits, damage, reactions and knock-outs.</p></div>
       <div><h3><small>(d)</small>Real-time video generation</h3><p>Wan2.2-TI2V-5B renders the proxies conditioned on the first frame, one reference per character and the retained history, at 24 FPS with two denoising steps.</p></div>
     </div>
     <div class="eq">X̂<sub>t:t+L−1</sub> = G<sub>θ</sub>( P<sub>t:t+L−1</sub>, I<sub>0</sub>, {R<sub>k</sub>}<sub>k=1..K</sub> ; H<sub>&lt;t</sub> )</div>
-    <div style="height:var(--gap)"></div>
-    <div class="paper"><img src="assets/img/fig4.jpg" alt="Video generator architecture and character-aware adaptive masking." loading="lazy"></div>
-    <div class="parts">
+    <div class="gapv"></div>
+    <div class="paper rv"><img src="assets/img/fig4.jpg" alt="Video generator architecture and character-aware adaptive masking." loading="lazy"></div>
+    <div class="parts rv">
       <div><h3><small>Masking</small>Character-aware adaptive masking</h3><p>Each reference may reach only its own character's skeleton-derived region, expanded by 25%. The masks follow the characters, reduce appearance leakage between them, and on a transformation block the old identity's cached tokens while the background and first-frame sink stay visible.</p></div>
       <div><h3><small>Speed</small>Causal adaptation and distillation</h3><p>Following Causal Forcing++: teacher forcing, consistency distillation with a 20-latent-frame window and a first-frame sink, then DMD on the student's own rollouts. Proxy conditions and gated references stay active throughout.</p></div>
     </div>
@@ -300,12 +326,13 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
 
 <section id="data">
   <div class="wrap">
-    <div class="head">
+    <div class="head rv">
       <span class="kicker">Data</span>
-      <h2 class="title"><b>50.3 hours</b> of proxy–video pairs</h2>
+      <h2><b>50.3 hours</b> of proxy–video pairs</h2>
+      <p>Four sources, each adding something the others lack: diverse creature bodies, controlled synthetic events, real game footage and exact scripted fights.</p>
     </div>
-    <div class="paper"><img src="assets/img/fig2.jpg" alt="Dataset overview and processing pipeline." loading="lazy"></div>
-    <div class="tbl">
+    <div class="paper rv"><img src="assets/img/fig2.jpg" alt="Dataset overview and processing pipeline." loading="lazy"></div>
+    <div class="tbl rv">
       <table>
         <thead><tr><th>Source</th><th>Adds</th><th style="text-align:right">Hours</th></tr></thead>
         <tbody>
@@ -322,21 +349,18 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
 
 <section id="limits">
   <div class="wrap">
-    <div class="head"><span class="kicker">Limitations</span></div>
+    <div class="head rv"><span class="kicker">Limitations</span></div>
     <ul class="lim">
       <li>Characters with uncommon body structures can lack compatible motions in the library.</li>
       <li>Consistency between scene proxies and the generated video can decline over long rollouts.</li>
     </ul>
+    <div class="more" style="margin-top:48px"><a class="btn hot" href="gallery.html">See all results →</a></div>
   </div>
-</section>
-
-<section>
-  <div class="wrap more"><a href="gallery.html">All results</a></div>
 </section>
 
 <section id="cite">
   <div class="wrap">
-    <div class="bibbar"><span class="kicker">BibTeX</span><button class="chip" id="copybib" type="button" style="position:static">Copy</button></div>
+    <div class="bibbar"><span class="kicker">BibTeX</span><button class="copy" id="copybib" type="button">Copy</button></div>
     <pre id="bib">@article{wu2026wizard,
   title   = {Wizard: Manipulate Any World in Real Time via Agentic Control},
   author  = {Wu, Yuzhe and Lin, Zijun and Jin, Yeying},
@@ -345,45 +369,50 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
 }</pre>
   </div>
 </section>
+</main>
 
-<footer><div class="wrap">Wizard · Tencent · NUS · NTU</div></footer>
+<footer><div class="wrap"><img src="assets/img/favicon.png" alt="">Wizard · Tencent · NUS · NTU</div></footer>
+
+<dialog class="lb" id="lb"><button type="button" id="lbx">Close ✕</button><video controls playsinline loop></video><p></p></dialog>
 
 <script>
 (() => {
   const $ = s => document.querySelector(s), A = "assets/";
-  const whenSeen = (el, on, off) => new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? on() : off && off()), { rootMargin: "150px 0px" }).observe(el);
+  const whenSeen = (el, on, off) => new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? on() : off && off()), { rootMargin: "120px 0px" }).observe(el);
 
-  // ---------- case players: one case at a time, its inputs beside it
+  // ---------- case cards: video, title, one line, inputs (first frame / pictures / player input)
   const K = (...k) => k.map(x => '<span class="key">' + x + '</span>').join("");
   const SETS = {
     explore: [
       { v: "roam_hud", t: "Forest path", line: "Hold W: the path, the trees and the falls keep coming.", ins: [["First frame", ["in/manyou1_ff.jpg"]]], act: K("W") + " hold" },
-      { v: "roam2", t: "Ruins above the clouds", line: "Hold W and turn the camera right: the plateau, the ruins and the sea of clouds keep unfolding.", ins: [["First frame", ["in/manyou2_ff.jpg"]]], act: K("W") + " hold + " + K("mouse →") + " turn right" }
+      { v: "roam2", t: "Ruins above the clouds", line: "Hold W and turn right: the plateau, the ruins and the sea of clouds keep unfolding.", ins: [["First frame", ["in/manyou2_ff.jpg"]]], act: K("W") + " + " + K("mouse →") }
     ],
     summon: [
-      { v: "summon1", t: "Lava field", line: "A molten beast walks in from the haze and squares up to the knight.", ins: [["First frame", ["in/zhaohuan1_ff.jpg"]], ["Boss picture", ["in/zhaohuan1_ref.jpg"], true]], act: "summon(boss) → enters from off-screen" },
-      { v: "summon2", t: "Violet marsh", line: "The camera pans and the lich is already there, matching its picture.", ins: [["First frame", ["in/zhaohuan2_ff.jpg"]], ["Boss picture", ["in/zhaohuan2_ref.jpg"], true]], act: "summon(boss) → camera reveal" }
+      { v: "summon1", t: "Lava field", line: "A molten beast walks in from the haze and squares up to the knight.", ins: [["First frame", ["in/zhaohuan1_ff.jpg"]], ["Boss picture", ["in/zhaohuan1_ref.jpg"], true]], act: K("B") + " summon" },
+      { v: "summon2", t: "Violet marsh", line: "The camera pans and the lich is already there, matching its picture.", ins: [["First frame", ["in/zhaohuan2_ff.jpg"]], ["Boss picture", ["in/zhaohuan2_ref.jpg"], true]], act: K("B") + " summon" }
     ],
     transform: [
-      { v: "morph1", t: "Wolf to ice golem", line: "Mid-fight in a blizzard. The golem keeps the wolf's place and health.", ins: [["First frame", ["in/bianshen1_ff.jpg"]], ["Before → after", ["in/bianshen1_A.jpg", "in/bianshen1_B.jpg"], true]], act: "transform(boss, picture B)" },
-      { v: "morph2", t: "Knight to demon", line: "In a flooded cathedral, the knight becomes a horned demon.", ins: [["First frame", ["in/bianshen2_ff.jpg"]], ["Before → after", ["in/bianshen2_A.jpg", "in/bianshen2_B.jpg"], true]], act: "transform(boss, picture B)" }
+      { v: "morph1", t: "Wolf to ice golem", line: "Mid-fight in a blizzard. The golem keeps the wolf's place and health.", ins: [["First frame", ["in/bianshen1_ff.jpg"]], ["Before → after", ["in/bianshen1_A.jpg", "in/bianshen1_B.jpg"], true]], act: K("T") + " transform" },
+      { v: "morph2", t: "Knight to demon", line: "In a flooded cathedral, the knight becomes a horned demon.", ins: [["First frame", ["in/bianshen2_ff.jpg"]], ["Before → after", ["in/bianshen2_A.jpg", "in/bianshen2_B.jpg"], true]], act: K("T") + " transform" }
     ],
     mechanics: [
-      { v: "win", t: "Victory", line: "Two landed hits, at frames 96 and 160, take the lion down. VICTORY.", ins: [["First frame", ["in/win_ff.jpg"]]], act: "hp_boss → 0 · resolve KO" },
-      { v: "die", t: "You died", line: "Starting at 35% health, the knight takes one blow from the ape and falls. YOU DIED.", ins: [["First frame", ["in/die_ff.jpg"]]], act: "hp_player → 0 · resolve KO" }
+      { v: "win", t: "Victory", line: "Two landed hits, at frames 96 and 160, take the lion down.", ins: [["First frame", ["in/win_ff.jpg"]]], act: "hp_boss → 0 · KO" },
+      { v: "die", t: "You died", line: "At 35% health, the knight takes one blow from the ape and falls.", ins: [["First frame", ["in/die_ff.jpg"]]], act: "hp_player → 0 · KO" }
     ]
   };
-  document.querySelectorAll(".case[data-set]").forEach(box => {
-    const list = SETS[box.dataset.set];
-    box.innerHTML = '<div><div class="clip"><video muted loop playsinline preload="none"></video></div><p class="line"></p></div><div class="side"><div class="ins"></div><div class="tabs"></div></div>';
-    const v = box.querySelector("video"), line = box.querySelector(".line"), ins = box.querySelector(".ins"), tabs = box.querySelector(".tabs");
-    let seen = false;
-    function show(i) {
-      const c = list[i];
-      tabs.querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
-      v.poster = A + "v/" + c.v + ".jpg"; v.src = A + "v/" + c.v + ".mp4"; if (seen) v.play().catch(() => {});
-      line.innerHTML = "<b></b> "; line.querySelector("b").textContent = c.t + "."; line.append(c.line);
-      ins.innerHTML = "";
+  const lb = $("#lb"), lbv = lb.querySelector("video"), lbp = lb.querySelector("p");
+  const openLB = (src, poster, cap) => { lbv.poster = poster; lbv.src = src; lbp.textContent = cap; lb.showModal(); lbv.play().catch(() => {}); };
+  lb.addEventListener("close", () => { lbv.pause(); lbv.removeAttribute("src"); lbv.load(); });
+  $("#lbx").addEventListener("click", () => lb.close());
+  lb.addEventListener("click", e => { if (e.target === lb) lb.close(); });
+
+  document.querySelectorAll(".cards[data-set]").forEach(box => {
+    SETS[box.dataset.set].forEach(c => {
+      const f = document.createElement("figure"); f.className = "card rv";
+      f.innerHTML = '<div class="clip" role="button" tabindex="0" aria-label="Open larger"><video muted loop playsinline preload="none"></video><span class="zoom" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span></div><figcaption><h3></h3><p class="line"></p><div class="ins"></div></figcaption>';
+      const v = f.querySelector("video"), src = A + "v/" + c.v + ".mp4", poster = A + "v/" + c.v + ".jpg"; v.poster = poster;
+      f.querySelector("h3").textContent = c.t; f.querySelector(".line").textContent = c.line;
+      const ins = f.querySelector(".ins");
       c.ins.forEach(([lab, srcs, sq]) => {
         const d = document.createElement("div"); d.innerHTML = '<span class="lab"></span><div class="row"></div>'; d.querySelector(".lab").textContent = lab;
         srcs.forEach((s, k) => { if (k) { const a = document.createElement("span"); a.className = "arr"; a.textContent = "→"; d.querySelector(".row").append(a); }
@@ -391,32 +420,14 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
         ins.append(d);
       });
       const p = document.createElement("div"); p.innerHTML = '<span class="lab">Player</span><div class="act"></div>'; p.querySelector(".act").innerHTML = c.act; ins.append(p);
-    }
-    list.forEach((c, i) => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = "<small>0" + (i + 1) + "</small><span></span>"; b.querySelector("span").textContent = c.t; b.addEventListener("click", () => show(i)); tabs.append(b); });
-    show(0);
-    whenSeen(box, () => { seen = true; v.play().catch(() => {}); }, () => v.pause());
-  });
-
-  // ---------- two cases side by side (summon, transform): each clip with its own inputs under it
-  document.querySelectorAll(".duo[data-set]").forEach(box => {
-    SETS[box.dataset.set].forEach(c => {
-      const f = document.createElement("figure");
-      f.innerHTML = '<div class="clip"><video muted loop playsinline preload="none"></video></div><figcaption><p class="line"><b></b> </p><div class="ins"></div></figcaption>';
-      const v = f.querySelector("video"); v.poster = A + "v/" + c.v + ".jpg"; v.dataset.s = A + "v/" + c.v + ".mp4";
-      f.querySelector("b").textContent = c.t + "."; f.querySelector(".line").append(c.line);
-      const ins = f.querySelector(".ins");
-      c.ins.forEach(([lab, srcs, sq]) => {
-        const d = document.createElement("div"); d.innerHTML = '<span class="lab"></span><div class="row"></div>'; d.querySelector(".lab").textContent = lab;
-        srcs.forEach((src, k) => { if (k) { const a = document.createElement("span"); a.className = "arr"; a.textContent = "→"; d.querySelector(".row").append(a); }
-          const im = document.createElement("img"); im.src = A + src; im.alt = lab; im.loading = "lazy"; if (sq) im.className = "sq"; d.querySelector(".row").append(im); });
-        ins.append(d);
-      });
+      const clip = f.querySelector(".clip"), open = () => openLB(src, poster, c.t + ". " + c.line);
+      clip.addEventListener("click", open); clip.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
       box.append(f);
-      whenSeen(f, () => { if (!v.src) v.src = v.dataset.s; v.play().catch(() => {}); }, () => v.pause());
+      whenSeen(f, () => { if (!v.src) v.src = src; v.play().catch(() => {}); }, () => v.pause());
     });
   });
 
-  // ---------- drag-to-compare screens over a packed clip (video | proxy)
+  // ---------- drag-to-compare screen over a packed clip (video | proxy)
   function Screen(el) {
     const cv = el.querySelector("canvas"), ctx = cv.getContext("2d"), seam = el.querySelector(".seam");
     const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "auto";
@@ -442,14 +453,14 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
     };
   }
 
-  // ---------- 04: choose a world, then a spell. mode "state" = video still rendering, "video" = no proxy kept
+  // ---------- 04: choose a world, then a spell
   const WORLDS = [
     { k: "forest", name: "Forest", ff: "img/forest_ff.jpg", spells: [
-      { k: "opt_roll",    name: "Flip the world",   say: "turn the whole world on its side",        code: "roll(theta=90°)",                   mode: "pair" },
-      { k: "opt_split",   name: "Split the ground", say: "tear the ground open ahead of me",        code: "part(width=1h, depth=3h)",          mode: "pair" },
-      { k: "opt_sink",    name: "Collapse",         say: "sink the forest into the earth",          code: "pit(from=4.5h, depth=20h)",         mode: "pair" },
-      { k: "opt_tornado", name: "Tornado",          say: "summon a tornado in the clearing",        code: "spawn('tornado', ahead=7h)",        mode: "pair" },
-      { k: "opt_fold",    name: "Fold into a wall", say: "lift the forest up like a page",          code: "fold(theta=60°, at=10h)",           mode: "pair" },
+      { k: "opt_roll",    name: "Flip the world",   say: "turn the whole world on its side",         code: "roll(theta=90°)",                   mode: "pair" },
+      { k: "opt_split",   name: "Split the ground", say: "tear the ground open ahead of me",         code: "part(width=1h, depth=3h)",          mode: "pair" },
+      { k: "opt_sink",    name: "Collapse",         say: "sink the forest into the earth",           code: "pit(from=4.5h, depth=20h)",         mode: "pair" },
+      { k: "opt_tornado", name: "Tornado",          say: "summon a tornado in the clearing",         code: "spawn('tornado', ahead=7h)",        mode: "pair" },
+      { k: "opt_fold",    name: "Fold into a wall", say: "lift the forest up like a page",           code: "fold(theta=60°, at=10h)",           mode: "pair" },
       { k: "opt_stairs",  name: "Raise stairs",     say: "raise a stairway out of the forest floor", code: "blocks(n=8, step=0.8h, rise=0.4h)", mode: "pair" } ] }
   ];
   const world = Screen($("#world")), say = $("#say"), worlds = $("#worlds"), spells = $("#spells");
@@ -460,21 +471,29 @@ footer { margin-top: var(--gap); padding-block: 36px 60px; border-top: 1px solid
     clearInterval(typing); let n = 0;
     say.innerHTML = "<i>›</i><b></b>"; const sp = say.querySelector("b"); sp.style.fontWeight = "400";
     typing = setInterval(() => { n++; sp.textContent = s.say.slice(0, n);
-      if (n >= s.say.length) { clearInterval(typing); sp.textContent = s.say + "  →  " + s.code + (s.mode === "state" ? "   · proxy preview, video rendering" : ""); world.load(A + "v/" + s.k + "_pair.mp4", s.mode); } }, 20);
+      if (n >= s.say.length) { clearInterval(typing); sp.textContent = s.say + "  →  " + s.code; world.load(A + "v/" + s.k + "_pair.mp4", s.mode); } }, 20);
   }
   function pickWorld(i) {
     wi = i; worlds.querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
     world.still(A + WORLDS[i].ff); clearInterval(typing); say.innerHTML = "<i>›</i>choose a spell";
     spells.innerHTML = "";
     WORLDS[i].spells.forEach((s, j) => { const b = document.createElement("button"); b.type = "button"; b.className = "spell";
-      b.innerHTML = "<b></b><code></code>" + (s.mode === "state" ? "<em>proxy preview · video rendering</em>" : "");
-      b.querySelector("b").textContent = s.name; b.querySelector("code").textContent = s.code; b.addEventListener("click", () => cast(j)); spells.append(b); });
+      b.innerHTML = "<b></b><code></code>"; b.querySelector("b").textContent = s.name; b.querySelector("code").textContent = s.code; b.addEventListener("click", () => cast(j)); spells.append(b); });
   }
   WORLDS.forEach((w, i) => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = '<img alt=""><span></span>'; b.querySelector("img").src = A + w.ff; b.querySelector("span").textContent = w.name; b.addEventListener("click", () => pickWorld(i)); worlds.append(b); });
   pickWorld(0);
+
+  // ---------- jump links follow the scroll; sections fade in once
+  const links = [...document.querySelectorAll(".jump a")], byId = Object.fromEntries(links.map(a => [a.hash.slice(1), a]));
+  const spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { links.forEach(a => a.classList.remove("on")); const a = byId[e.target.id]; if (a) { a.classList.add("on"); const j = a.parentElement; j.scrollTo({ left: a.offsetLeft - j.clientWidth / 2 + a.offsetWidth / 2, behavior: "smooth" }); } } }), { rootMargin: "-45% 0px -50% 0px" });
+  document.querySelectorAll("section[id]").forEach(s => spy.observe(s));
+  const rv = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); rv.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+  document.querySelectorAll(".rv").forEach(el => rv.observe(el));
 
   const cb = $("#copybib"), bib = $("#bib");
   cb.addEventListener("click", () => { const sel = () => { const r = document.createRange(); r.selectNodeContents(bib); const s = getSelection(); s.removeAllRanges(); s.addRange(r); cb.textContent = "Selected"; };
     if (navigator.clipboard) navigator.clipboard.writeText(bib.textContent).then(() => { cb.textContent = "Copied"; setTimeout(() => cb.textContent = "Copy", 1500); }, sel); else sel(); });
 })();
 </script>
+</body>
+</html>
