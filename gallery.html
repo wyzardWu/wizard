@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wizard Results Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,300;125,700&family=Hanken+Grotesk:wght@400;500&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root { --night: #171b21; --haze: rgba(32,37,45,.62); --mist: rgba(170,182,196,.16); --cyan: #a7c4c9; --text: #ecebe7; --dim: #9ba1a8;
+  --f-title: "Archivo", "Helvetica Neue", Arial, sans-serif; --f-body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif; --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { background: radial-gradient(60% 34% at 50% -4%, rgba(206,216,228,.14), transparent 72%), radial-gradient(42% 34% at 6% 40%, rgba(142,120,150,.11), transparent 70%), radial-gradient(40% 32% at 96% 70%, rgba(104,146,150,.10), transparent 70%), linear-gradient(178deg, #222831 0%, #1a1f26 30%, #171b21 60%, #1d1c1f 100%) fixed, var(--night); color: var(--text); font: 400 1rem/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+a { color: var(--cyan); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { padding-block: 56px 8px; display: grid; gap: 16px; }
+.back { font: 500 .72rem/1 var(--f-mono); letter-spacing: .2em; text-transform: uppercase; text-decoration: none; }
+h1 { margin: 0; font: 300 clamp(1.6rem, 4vw, 2.6rem)/1.15 var(--f-title); font-stretch: 125%; letter-spacing: .24em; text-transform: uppercase; }
+h1 b { font-weight: 700; }
+.lead { color: var(--dim); max-width: 60ch; margin: 0; }
+section { padding-block: 72px 0; }
+h2 { margin: 0 0 26px; font: 500 .72rem/1 var(--f-mono); letter-spacing: .3em; text-transform: uppercase; color: var(--cyan); }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 16px; }
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+figure { margin: 0; display: grid; gap: 10px; min-width: 0; }
+.clip { aspect-ratio: 16/9; max-width: 100%; background: var(--haze); overflow: hidden; box-shadow: 0 0 0 1px var(--mist); }
+.clip video { width: 100%; height: 100%; object-fit: cover; display: block; }
+figcaption { font-size: .8125rem; color: var(--dim); }
+figcaption b { color: var(--text); font-weight: 500; }
+footer { margin-top: 120px; padding-block: 32px 56px; border-top: 1px solid var(--mist); color: var(--dim); font-size: .8125rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" href="index.html">← Wizard</a>
+    <h1><b>All</b> results</h1>
+    <p class="lead">Every clip starts from a single image the model never saw in training. Scenes, characters and edits are driven by the agentic framework; the video model only renders.</p>
+  </header>
+  <div id="groups"></div>
+  <footer>Wizard · Tencent · NUS · NTU</footer>
+</div>
+<script>
+(() => {
+  const G = [
+    ["Reshape the world", [
+      ["spout_hud", "Storm at sea", "typed in game, cast with the spell button"],
+      ["cyber_split", "Neon street splits", ""],
+      ["ice", "Ice pillars", "on a mirror-flat salt lake"],
+      ["stairs", "Meadow stairs", "build up at sunset"],
+      ["sinkforest", "Sinking forest", "and rising back"],
+      ["castle_pit", "Courtyard collapse", "the witch drops into the pit"],
+      ["castle_canal", "Courtyard canal", "a shallow channel carved under her feet"],
+      ["slice", "Frozen lake", "sliced into blocks"],
+      ["split", "Headland", "splits open"],
+      ["roll", "Castle gate", "the ground rolls"]
+    ]],
+    ["Summon and transform", [
+      ["summon1", "Lava field", "a beast from one picture"],
+      ["summon2", "Violet marsh", "a lich revealed by the camera"],
+      ["witch_unicorn", "Dragon to unicorn", ""],
+      ["morph1", "Wolf to ice golem", ""],
+      ["morph2", "Knight to demon", ""],
+      ["ariel", "Pointed spell", "a spirit appears where the staff points"]
+    ]],
+    ["Fights", [
+      ["tiger", "White tiger", "ink-wash bamboo grove"],
+      ["win", "Victory", "two hits, the lion falls"],
+      ["die", "You died", "one blow from the ape"],
+      ["voldemort", "Dark wizard", "rain-soaked courtyard"],
+      ["niulai", "Plush yellow bull", "among the peaks"],
+      ["greenbull", "Moss-backed boar", "on the savanna"],
+      ["d3_hud", "Gargoyle dragon", "academy terrace"],
+      ["d4_hud", "Stone colossus", "desert moon"]
+    ]],
+    ["Explore", [
+      ["roam_hud", "Forest path", "with the input on screen"],
+      ["roam2", "Ruins above the clouds", ""]
+    ]]
+  ];
+  const root = document.getElementById("groups");
+  const io = new IntersectionObserver(es => es.forEach(e => { const v = e.target;
+    if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else if (!v.paused) v.pause(); }), { rootMargin: "200px 0px" });
+  G.forEach(([title, items]) => {
+    const s = document.createElement("section"); s.innerHTML = "<h2></h2><div class='grid'></div>"; s.querySelector("h2").textContent = title;
+    items.forEach(([k, name, note]) => {
+      const f = document.createElement("figure");
+      f.innerHTML = '<div class="clip"><video muted loop playsinline preload="none"></video></div><figcaption><b></b> <span></span></figcaption>';
+      const v = f.querySelector("video"); v.dataset.src = "assets/v/" + k + ".mp4"; v.poster = "assets/v/" + k + ".jpg";
+      f.querySelector("b").textContent = name; f.querySelector("span").textContent = note;
+      s.querySelector(".grid").append(f); io.observe(v);
+    });
+    root.append(s);
+  });
+})();
+</script>
+</body>
+</html>
