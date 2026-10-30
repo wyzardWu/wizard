@@ -62,7 +62,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 22px; }
 .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); font: 500 .84rem/1 var(--sans); text-decoration: none; }
 .btn small { font-size: .72rem; color: var(--faint); }
-.film { margin: 36px auto 0; max-width: calc(min(780px, 86vw) + 16px); padding: 8px; }   /* same video width as the capability carousel */
+.film { margin: 36px auto 0; max-width: 920px; padding: 8px; }
 .film video { display: block; width: 100%; aspect-ratio: 16/9; border-radius: 7px; background: #000; }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; max-width: 920px; margin: 14px auto 0; }
 .stat { padding: 16px 14px; }
@@ -86,7 +86,7 @@ section { padding-top: 84px; }
 figure { margin: 0; }
 
 /* centred-bleed carousel (Genie 4): the active slide centred, neighbours peeking and dimmed, swipe or arrows */
-.carousel { --sw: min(780px, 86vw); display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding: 4px calc((100vw - var(--sw)) / 2) 6px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.carousel { --sw: min(570px, 86vw);   /* (10-30) same size as the reshape screen */ display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding: 4px calc((100vw - var(--sw)) / 2) 6px; scrollbar-width: none; overscroll-behavior-x: contain; }
 .carousel::-webkit-scrollbar { display: none; }
 .slide { flex: 0 0 var(--sw); scroll-snap-align: center; margin: 0; opacity: .35; transform: scale(.94); transition: opacity .35s, transform .35s; }
 .slide.on { opacity: 1; transform: none; }
