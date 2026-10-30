@@ -62,7 +62,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 22px; }
 .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); font: 500 .84rem/1 var(--sans); text-decoration: none; }
 .btn small { font-size: .72rem; color: var(--faint); }
-.film { margin: 36px auto 0; max-width: 920px; padding: 8px; }
+.film { margin: 36px auto 0; max-width: calc(min(780px, 86vw) + 16px); padding: 8px; }   /* same video width as the capability carousel */
 .film video { display: block; width: 100%; aspect-ratio: 16/9; border-radius: 7px; background: #000; }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; max-width: 920px; margin: 14px auto 0; }
 .stat { padding: 16px 14px; }
