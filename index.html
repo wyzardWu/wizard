@@ -72,15 +72,16 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 /* sections */
 section { padding-top: 84px; }
-.sh { display: grid; gap: 10px; margin-bottom: 22px; max-width: 68ch; }
+.sh { display: grid; gap: 10px; margin: 0 auto 22px; max-width: 920px; text-align: center; justify-items: center; }
+.sh p { max-width: 68ch; }
 .sh h2 { font: 300 clamp(1.25rem, 2.3vw, 1.7rem)/1.25 var(--title); font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase; }
 .sh h2 b { font-weight: 700; }
 .sh p { color: var(--muted); }
-.lead { color: var(--muted); max-width: 72ch; font-size: 1.02rem; }
+.lead { color: var(--muted); max-width: 72ch; font-size: 1.02rem; margin-inline: auto; }
 .lead b { color: var(--ink); font-weight: 500; }
 .paper { background: #f1f1ef; border-radius: var(--r); padding: 12px; }
 .paper img { display: block; width: 100%; height: auto; border-radius: 4px; }
-.figcap { color: var(--muted); font-size: .82rem; margin-top: 10px; line-height: 1.55; }
+.figcap { color: var(--muted); font-size: .82rem; margin-top: 10px; line-height: 1.55; text-align: center; }
 .figcap b { color: var(--ink); font-weight: 600; }
 figure { margin: 0; }
 
@@ -261,7 +262,7 @@ dialog.lb p { color: var(--muted); text-align: center; font-size: .88rem; margin
 <main>
 <section id="overview">
   <div class="wrap">
-    <div class="sh"><span class="kicker">Overview</span><h2><b>One image</b> in. A world you can play.</h2></div>
+    <div class="sh"><span class="kicker">Overview</span><h2><b>Change the world</b> as you play.</h2></div>
     <p class="lead">Game world models can generate interactive video in real time, but a game needs more than walking around: a boss that appears and fights by its own rules, a creature that turns into another, ground that splits or rises on command. <b>Wizard</b> keeps the game state explicit: scene geometry for the world, an articulated skeleton for every character, and rules for the fight. Agents edit that state from one image, a typed instruction or a key press; a causal video model renders it at 24 FPS. Every scene and character on this page is new to the model.</p>
     <figure style="margin-top:26px"><div class="paper"><img src="assets/img/fig1.jpg" alt="Overview: world exploration, character summoning, character transformation and scene manipulation, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay." loading="lazy"></div>
       <figcaption class="figcap"><b>Figure 1.</b> Four ways to play, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay.</figcaption></figure>
