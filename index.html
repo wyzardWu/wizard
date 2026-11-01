@@ -10,21 +10,25 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,300;125,500;125,700&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* (10-29 user: 深色调不变；下面的 case 视频太大太杂、不高级；参考 ActionRoPE / HY-Nomas / Genie 4)
-   Dark page, text first. The trailer is the one big video. All cases sit in a single viewer (tabs, one clip at a time,
-   inputs beside it); the gallery shows stills and plays a clip only on hover or click. Method = text beside its figure. */
+/* (11-01 user: 换成浅色"冷雾菌落"配色 —— 冷雾白 #EEF5F0 / 菌落灰绿 #C7D8D0 / 冰雾蓝 #B8D4E7 / 菌落淡紫 #D8D0E6 / 标本灰蓝 #667D87)
+   Misty light page, text first. Cards are translucent frosted panels; paper figures sit on it as white sheets.
+   The trailer is the one big video; cases sit in one carousel; the gallery plays a clip only on hover or click. */
 :root {
-  --bg: #12151a; --card: #191d24; --card2: #1f242c; --ink: #ecebe7; --muted: #9aa1aa; --faint: #6d747d;
-  --line: rgba(170,182,196,.14); --line2: rgba(170,182,196,.26); --accent: #a7c4c9; --accent-soft: rgba(167,196,201,.09);
+  --bg: #eef5f0; --card: rgba(255,255,255,.52); --card2: rgba(255,255,255,.78); --ink: #22303a; --muted: #536874; --faint: #7a8e98;
+  --line: rgba(102,125,135,.18); --line2: rgba(102,125,135,.34); --accent: #4d6672; --accent-soft: rgba(216,208,230,.55);
+  --mist-green: #c7d8d0; --mist-blue: #b8d4e7; --mist-violet: #d8d0e6; --slate: #667d87;
   --title: "Archivo", "Helvetica Neue", Arial, sans-serif; --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif; --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
   --max: 1040px; --r: 12px;
-  color-scheme: dark;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 64px; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
 body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(70% 40% at 50% -6%, rgba(120,140,190,.18), transparent 70%), radial-gradient(40% 30% at 0% 45%, rgba(142,120,170,.06), transparent 70%); }
+  background: radial-gradient(80% 46% at 50% -8%, rgba(184,212,231,.85), transparent 72%),
+              radial-gradient(46% 38% at -4% 42%, rgba(216,208,230,.75), transparent 70%),
+              radial-gradient(44% 40% at 104% 72%, rgba(199,216,208,.85), transparent 70%),
+              linear-gradient(180deg, #e6eef1 0%, #eef5f0 45%, #edf1f4 100%); }
 img, video { max-width: 100%; }
 h1, h2, h3, p { margin: 0; }
 h2 { text-wrap: balance; }
@@ -32,11 +36,11 @@ a { color: var(--accent); text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .wrap { max-width: var(--max); margin: 0 auto; padding-inline: max(20px, env(safe-area-inset-left, 0px)) max(20px, env(safe-area-inset-right, 0px)); }
 .kicker { font: 500 .68rem/1 var(--mono); letter-spacing: .24em; text-transform: uppercase; color: var(--accent); }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); }
-.key { display: inline-block; font: 500 .68rem/1 var(--mono); padding: 4px 6px; border: 1px solid var(--line2); border-bottom-width: 2px; border-radius: 4px; background: var(--card2); color: var(--ink); margin-right: 3px; }
+.card { background: var(--card); border: 1px solid rgba(255,255,255,.7); border-radius: var(--r); box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 10px 30px -18px rgba(54,78,90,.35); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.key { display: inline-block; font: 500 .68rem/1 var(--mono); padding: 4px 6px; border: 1px solid var(--line2); border-bottom-width: 2px; border-radius: 4px; background: #fff; color: var(--ink); margin-right: 3px; }
 
 /* top bar */
-.bar { position: sticky; top: 0; z-index: 20; background: rgba(18,21,26,.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.bar { position: sticky; top: 0; z-index: 20; background: rgba(238,245,240,.72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
 .bar .wrap { display: flex; align-items: center; gap: 16px; height: 52px; }
 .brand { display: flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none; flex: none; font: 700 .78rem/1 var(--title); font-stretch: 125%; letter-spacing: .26em; }
 .brand img { width: 28px; height: 28px; object-fit: contain; }
@@ -48,7 +52,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 /* hero */
 .hero { text-align: center; padding-block: 48px 0; }
-.mascot { width: 132px; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 10px 28px rgba(110,140,255,.32)); }
+.mascot { width: 132px; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 12px 26px rgba(102,125,135,.32)); }
 .hero h1 { font: 700 clamp(2.3rem, 6vw, 4.2rem)/1 var(--title); font-stretch: 125%; letter-spacing: .3em; padding-left: .3em; margin-top: 16px; }
 .hero .sub { font: 300 clamp(.78rem, 1.4vw, 1rem)/1.5 var(--title); font-stretch: 125%; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 16px; }
 .authors { margin-top: 24px; display: grid; gap: 2px; }
@@ -63,7 +67,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); font: 500 .84rem/1 var(--sans); text-decoration: none; }
 .btn small { font-size: .72rem; color: var(--faint); }
 .film { margin: 36px auto 0; max-width: 920px; padding: 8px; }
-.film video { display: block; width: 100%; aspect-ratio: 16/9; border-radius: 7px; background: #000; }
+.film video { display: block; width: 100%; aspect-ratio: 16/9; border-radius: 7px; background: #1c262c; }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; max-width: 920px; margin: 14px auto 0; }
 .stat { padding: 16px 14px; }
 .stat b { display: block; font: 500 1.5rem/1.1 var(--title); font-stretch: 125%; font-variant-numeric: tabular-nums; }
@@ -79,8 +83,15 @@ section { padding-top: 84px; }
 .sh p { color: var(--muted); }
 .lead { color: var(--muted); max-width: 72ch; font-size: 1.02rem; margin-inline: auto; }
 .lead b { color: var(--ink); font-weight: 500; }
-.paper { background: #f1f1ef; border-radius: var(--r); padding: 12px; }
-.paper img { display: block; width: 100%; height: auto; border-radius: 4px; }
+/* paper figures: the outer white is knocked out (tools/knockout.py), so the panels sit directly on the mist */
+.paper { padding: 0; }
+.paper img { display: block; width: 100%; height: auto; filter: drop-shadow(0 10px 22px rgba(54,78,90,.16)); }
+/* overview / method intro: heading left, text right, together as wide as the figure below */
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px 56px; align-items: start; margin-bottom: 30px; }
+.split .sh { text-align: left; justify-items: start; margin: 0; }
+.split .sh h2 { font-size: clamp(1.4rem, 2.7vw, 2.05rem); line-height: 1.2; }
+.split .lead { max-width: none; margin: 0; padding-top: 22px; }
+@media (max-width: 820px) { .split { grid-template-columns: minmax(0, 1fr); } .split .lead { padding-top: 0; } }
 .figcap { color: var(--muted); font-size: .82rem; margin-top: 10px; line-height: 1.55; text-align: center; }
 .figcap b { color: var(--ink); font-weight: 600; }
 figure { margin: 0; }
@@ -90,7 +101,7 @@ figure { margin: 0; }
 .carousel::-webkit-scrollbar { display: none; }
 .slide { flex: 0 0 var(--sw); scroll-snap-align: center; margin: 0; opacity: .35; transform: scale(.94); transition: opacity .35s, transform .35s; }
 .slide.on { opacity: 1; transform: none; }
-.slide .clip { position: relative; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 0 0 1px var(--line); cursor: pointer; }
+.slide .clip { position: relative; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #1c262c; box-shadow: 0 18px 40px -22px rgba(54,78,90,.55); cursor: pointer; }
 .slide video, .slide .clip img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .slide .zoom { position: absolute; right: 10px; top: 10px; font: 500 .68rem/1 var(--sans); color: #fff; background: rgba(0,0,0,.55); padding: 6px 9px; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none; }
 .slide.on .zoom { opacity: 1; }
@@ -106,7 +117,7 @@ figure { margin: 0; }
 .carnav > button:hover { background: var(--card); }
 .dots { display: flex; gap: 8px; }
 .dots button { width: 8px; height: 8px; padding: 0; border-radius: 50%; border: 0; background: var(--line2); cursor: pointer; transition: width .25s, background .25s; }
-.dots button[aria-current="true"] { width: 22px; border-radius: 4px; background: var(--accent); }
+.dots button[aria-current="true"] { width: 22px; border-radius: 4px; background: var(--slate); }
 
 /* capability viewer: tabs, one video, the inputs beside it */
 .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
@@ -114,7 +125,7 @@ figure { margin: 0; }
 .tabs button small { font: 500 .68rem var(--mono); color: var(--faint); }
 .tabs button:hover { color: var(--ink); }
 .tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.tabs button[aria-selected="true"] small { color: #5a6068; }
+.tabs button[aria-selected="true"] small { color: var(--mist-blue); }
 .viewer { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); overflow: hidden; }
 @media (max-width: 820px) { .viewer { grid-template-columns: minmax(0, 1fr); } }
 .viewer .vid { position: relative; background: #000; }
@@ -157,15 +168,16 @@ figure { margin: 0; }
 .screen { position: relative; aspect-ratio: 832/468; border-radius: 8px; background: #000 center/cover no-repeat; overflow: hidden; touch-action: pan-y; user-select: none; }
 .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .screen .tag { position: absolute; top: 10px; font: 500 .62rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; padding: 6px 8px; border-radius: 5px; background: rgba(0,0,0,.6); pointer-events: none; }
-.screen .tag.l { left: 10px; } .screen .tag.r { right: 10px; color: var(--accent); }
-.screen .seam { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--accent); box-shadow: 0 0 12px var(--accent); pointer-events: none; }
-.screen .seam::after { content: ""; position: absolute; top: 50%; left: 0; width: 26px; height: 26px; transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid var(--accent); background: rgba(0,0,0,.45); }
+.screen .tag { color: #fff; }
+.screen .tag.l { left: 10px; } .screen .tag.r { right: 10px; color: var(--mist-blue); }
+.screen .seam { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--mist-blue); box-shadow: 0 0 12px var(--mist-blue); pointer-events: none; }
+.screen .seam::after { content: ""; position: absolute; top: 50%; left: 0; width: 26px; height: 26px; transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid var(--mist-blue); background: rgba(0,0,0,.45); }
 .screen[data-mode="still"] canvas, .screen[data-mode="still"] .seam, .screen[data-mode="still"] .tag,
 .screen[data-mode="video"] .seam, .screen[data-mode="video"] .tag,
 .screen[data-mode="state"] .seam, .screen[data-mode="state"] .tag.l { display: none; }
 .say { position: absolute; left: 10px; bottom: 10px; right: 10px; font: 400 .76rem/1.4 var(--mono); }
-.say span { display: inline-block; max-width: 100%; background: rgba(0,0,0,.7); border: 1px solid var(--line2); border-radius: 6px; padding: 7px 10px; }
-.say i { color: var(--accent); font-style: normal; margin-right: 6px; }
+.say span { display: inline-block; max-width: 100%; background: rgba(20,28,34,.72); color: #eef5f0; border: 1px solid rgba(255,255,255,.18); border-radius: 6px; padding: 7px 10px; }
+.say i { color: var(--mist-blue); font-style: normal; margin-right: 6px; }
 .spells { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
 @media (max-width: 480px) { .spells { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .spell { display: grid; padding: 0; text-align: left; background: var(--card2); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; color: var(--ink); cursor: pointer; font: inherit; transition: border-color .15s; }
@@ -173,7 +185,7 @@ figure { margin: 0; }
 .spell[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
 /* (10-30 user: 改世界的选项就只要 logo，不要截图) */
 .spell { justify-items: center; gap: 8px; padding: 16px 8px 12px; text-align: center; }
-.spell svg { width: 34px; height: 34px; stroke: var(--accent); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.spell svg { width: 34px; height: 34px; stroke: var(--slate); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .spell b { font: 600 .78rem/1.2 var(--sans); }
 .code { margin-top: 10px; font: 400 .74rem/1.5 var(--mono); color: var(--faint); min-height: 1.5em; }
 .code b { color: var(--accent); font-weight: 500; }
@@ -185,13 +197,11 @@ figure { margin: 0; }
 .parts h3 { font: 600 .95rem/1.3 var(--sans); margin-bottom: 6px; }
 .parts h3 small { color: var(--accent); margin-right: 8px; font: 500 .72rem var(--mono); }
 .parts p { color: var(--muted); font-size: .9rem; }
-.eq { margin-top: 12px; text-align: center; }
 .mrow { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px; align-items: start; }
 .mrow + .mrow { margin-top: 40px; }
 @media (max-width: 860px) { .mrow { grid-template-columns: minmax(0, 1fr); } }
 .mtext { display: grid; gap: 12px; font-size: .93rem; color: var(--muted); }
 .mtext b { color: var(--ink); font-weight: 600; }
-.eq { font: 400 .82rem/1.6 var(--mono); padding: 10px 12px; border: 1px solid var(--line); background: var(--card); border-radius: 8px; overflow-x: auto; white-space: nowrap; color: var(--ink); }
 
 /* table */
 .tbl { overflow-x: auto; padding: 4px 18px; margin-top: 14px; }
@@ -207,7 +217,7 @@ tbody tr:last-child td { border-bottom: 0; color: var(--ink); font-weight: 600; 
 @media (max-width: 820px) { .gal { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .gal figure { overflow: hidden; cursor: zoom-in; transition: border-color .2s; }
 .gal figure:hover { border-color: var(--line2); }
-.gal .clip { position: relative; aspect-ratio: 16/9; background: #000; }
+.gal .clip { position: relative; aspect-ratio: 16/9; background: #1c262c; }
 .gal .clip img, .gal .clip video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .gal .clip img { opacity: .82; transition: opacity .2s; }
 .gal figure:hover .clip img { opacity: 1; }
@@ -225,10 +235,10 @@ footer .wrap { display: flex; align-items: center; gap: 8px; }
 footer img { width: 22px; height: 22px; object-fit: contain; }
 
 dialog.lb { border: 0; padding: 0; background: transparent; width: min(1200px, 94vw); max-width: none; overflow: visible; }
-dialog.lb::backdrop { background: rgba(5,6,8,.86); }
+dialog.lb::backdrop { background: rgba(28,38,44,.82); backdrop-filter: blur(6px); }
 dialog.lb video { display: block; width: 100%; border-radius: 10px; background: #000; }
-dialog.lb button { position: absolute; top: -42px; right: 0; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line2); background: var(--card); color: var(--ink); font: 500 .8rem/1 var(--sans); cursor: pointer; }
-dialog.lb p { color: var(--muted); text-align: center; font-size: .88rem; margin-top: 10px; }
+dialog.lb button { position: absolute; top: -42px; right: 0; padding: 8px 14px; border-radius: 999px; border: 0; background: #eef5f0; color: var(--ink); font: 500 .8rem/1 var(--sans); cursor: pointer; }
+dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -262,9 +272,9 @@ dialog.lb p { color: var(--muted); text-align: center; font-size: .88rem; margin
 <main>
 <section id="overview">
   <div class="wrap">
-    <div class="sh"><span class="kicker">Overview</span><h2><b>Change the world</b> as you play.</h2></div>
-    <p class="lead">Game world models can generate interactive video in real time, but a game needs more than walking around: a boss that appears and fights by its own rules, a creature that turns into another, ground that splits or rises on command. <b>Wizard</b> keeps the game state explicit: scene geometry for the world, an articulated skeleton for every character, and rules for the fight. Agents edit that state from one image, a typed instruction or a key press; a causal video model renders it at 24 FPS. Every scene and character on this page is new to the model.</p>
-    <figure style="margin-top:26px"><div class="paper"><img src="assets/img/fig1.jpg" alt="Overview: world exploration, character summoning, character transformation and scene manipulation, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay." loading="lazy"></div>
+    <div class="split"><div class="sh"><span class="kicker">Overview</span><h2><b>Change the world</b> as you play.</h2></div>
+    <p class="lead">Game world models can generate interactive video in real time, but a game needs more than walking around: a boss that appears and fights by its own rules, a creature that turns into another, ground that splits or rises on command. <b>Wizard</b> keeps the game state explicit: scene geometry for the world, an articulated skeleton for every character, and rules for the fight. Agents edit that state from one image, a typed instruction or a key press; a causal video model renders it at 24 FPS. Every scene and character on this page is new to the model.</p></div>
+    <figure style="margin-top:26px"><div class="paper"><img src="assets/img/fig1.webp" alt="Overview: world exploration, character summoning, character transformation and scene manipulation, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay." loading="lazy"></div>
       <figcaption class="figcap"><b>Figure 1.</b> Four ways to play, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay.</figcaption></figure>
   </div>
 </section>
@@ -301,29 +311,27 @@ dialog.lb p { color: var(--muted); text-align: center; font-size: .88rem; margin
 
 <section id="method">
   <div class="wrap">
-    <div class="sh"><span class="kicker">Method</span><h2><b>Agents</b> keep the state. <b>The model</b> paints it.</h2></div>
-    <p class="lead" style="margin-bottom:22px">A setup stage of under five minutes reconstructs the scene and characters, rigs skeletons and builds each character's motion set. During play, the framework updates motion, geometry and combat state, and the generator renders them.</p>
-    <figure><div class="paper"><img src="assets/img/fig3.jpg" alt="Inference pipeline: (a) character animation, (b) scene manipulation, (c) state-aware combat control, (d) real-time video generation." loading="lazy"></div><figcaption class="figcap"><b>Figure 2.</b> Inference pipeline.</figcaption></figure>
+    <div class="split"><div class="sh"><span class="kicker">Method</span><h2><b>Agents</b> keep the state. <b>The model</b> paints it.</h2></div>
+    <p class="lead">A setup stage of under five minutes reconstructs the scene and characters, rigs skeletons and builds each character's motion set. During play, the framework updates motion, geometry and combat state, and the generator renders them.</p></div>
+    <figure><div class="paper"><img src="assets/img/fig3.webp" alt="Inference pipeline: (a) character animation, (b) scene manipulation, (c) state-aware combat control, (d) real-time video generation." loading="lazy"></div><figcaption class="figcap"><b>Figure 2.</b> Inference pipeline.</figcaption></figure>
     <div class="parts">
       <div class="card"><h3><small>(a)</small>Character animation</h3><p>Qwen3-VL infers body structure; SAM2, TripoSG and UniRig give a labelled skeleton. Motions from CombatMotion, WildWorld and Elden Ring are retrieved by body structure and style, then retargeted limb chain by limb chain.</p></div>
       <div class="card"><h3><small>(b)</small>Scene manipulation</h3><p>MoGe-2 recovers geometry and camera. An OpenGL renderer draws the proxy, and Qwen3-VL-8B turns instructions into programs over geometric operators, from raising a platform to turning the world upside down.</p></div>
       <div class="card"><h3><small>(c)</small>State-aware combat</h3><p>The state tracks positions, poses, health, action phases and cooldowns. A planner simulates candidate attacks; a rule-based controller resolves hits, damage, reactions and knock-outs.</p></div>
       <div class="card"><h3><small>(d)</small>Real-time generation</h3><p>Wan2.2-TI2V-5B renders the proxies conditioned on the first frame, one reference per character and the retained history, at 24 FPS with two denoising steps.</p></div>
     </div>
-    <div class="eq">X̂<sub>t:t+L−1</sub> = G<sub>θ</sub>( P<sub>t:t+L−1</sub>, I<sub>0</sub>, {R<sub>k</sub>}<sub>k=1..K</sub> ; H<sub>&lt;t</sub> )</div>
-    <figure style="margin-top:48px"><div class="paper"><img src="assets/img/fig4.jpg" alt="Video generator architecture and character-aware adaptive masking." loading="lazy"></div><figcaption class="figcap"><b>Figure 3.</b> Generator and character-aware masking.</figcaption></figure>
+    <figure style="margin-top:48px"><div class="paper"><img src="assets/img/fig4.webp" alt="Video generator architecture and character-aware adaptive masking." loading="lazy"></div><figcaption class="figcap"><b>Figure 3.</b> Generator and character-aware masking.</figcaption></figure>
     <div class="parts">
       <div class="card"><h3><small>Masking</small>Character-aware adaptive masking</h3><p>Each reference may attend only to its own character's skeleton-derived region, expanded by 25%. The masks follow the characters and reduce appearance leakage; on a transformation they block the old identity's cached tokens while the background and first-frame sink stay visible.</p></div>
       <div class="card"><h3><small>Speed</small>Causal adaptation and distillation</h3><p>Following Causal Forcing++: teacher forcing, consistency distillation with a 20-latent-frame window and a first-frame sink, then DMD on the student's own rollouts. Proxy conditions and gated references stay active throughout.</p></div>
     </div>
-    <div class="eq">M<sub>ij</sub> = 0 if u<sub>i</sub> ∈ Ω<sub>k(j), τ(i)</sub>, otherwise −∞</div>
   </div>
 </section>
 
 <section id="data">
   <div class="wrap">
     <div class="sh"><span class="kicker">Data</span><h2><b>50.3 hours</b> of proxy–video pairs</h2><p>Four sources, each adding what the others lack: diverse creature bodies, controlled synthetic events, real game footage and exact scripted fights.</p></div>
-    <figure><div class="paper"><img src="assets/img/fig2.jpg" alt="Dataset overview and processing pipeline." loading="lazy"></div><figcaption class="figcap"><b>Figure 4.</b> Dataset overview and processing pipeline.</figcaption></figure>
+    <figure><div class="paper"><img src="assets/img/fig2.webp" alt="Dataset overview and processing pipeline." loading="lazy"></div><figcaption class="figcap"><b>Figure 4.</b> Dataset overview and processing pipeline.</figcaption></figure>
     <div class="tbl card">
       <table>
         <thead><tr><th>Source</th><th>Adds</th><th class="n">Hours</th></tr></thead>
