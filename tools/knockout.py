@@ -1,4 +1,5 @@
-# Make the white that is connected to a figure's outer border transparent, with soft edges.
+# Make the white that is connected to a figure's outer border transparent, with soft edges, then trim the margin.
+# Usage: python3 tools/knockout.py in.jpg out.webp
 import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
@@ -25,6 +26,8 @@ un = (a - 255 * (1 - ca[..., None])) / ca[..., None]
 alpha[zone] = ca[zone]
 rgb[zone] = un[zone]
 alpha[bg] = 0
-out = np.dstack([np.clip(rgb, 0, 255), alpha * 255]).astype(np.uint8)
-Image.fromarray(out, "RGBA").save(dst, "WEBP", quality=90, method=6)
+out = Image.fromarray(np.dstack([np.clip(rgb, 0, 255), alpha * 255]).astype(np.uint8))
+# crop the empty margin so the figure's visible edges sit on the page grid
+out = out.crop(out.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox())
+out.save(dst, "WEBP", quality=90, method=6)
 print(dst, f"{bg.mean():.0%} transparent")
