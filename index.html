@@ -53,6 +53,10 @@ a { color: var(--accent); text-underline-offset: 3px; }
 /* hero */
 .hero { text-align: center; padding-block: 48px 0; }
 .mascot { width: 132px; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 12px 26px rgba(102,125,135,.32)); }
+/* (11-01 user: 小女巫轻轻上下浮动) */
+.mascot { animation: float 4.2s ease-in-out infinite; will-change: transform; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@media (prefers-reduced-motion: reduce) { .mascot { animation: none; } }
 .hero h1 { font: 700 clamp(2.3rem, 6vw, 4.2rem)/1 var(--title); font-stretch: 125%; letter-spacing: .3em; padding-left: .3em; margin-top: 16px; }
 .hero .sub { font: 300 clamp(.78rem, 1.4vw, 1rem)/1.5 var(--title); font-stretch: 125%; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 16px; }
 .authors { margin-top: 24px; display: grid; gap: 2px; }
