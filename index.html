@@ -389,8 +389,8 @@ dialog.lb p { color: var(--muted); text-align: center; font-size: .88rem; margin
   // ---------- capability viewer: one clip at a time
   const CAPS = [
     { t: "Explore", cases: [
-      { v: "roam_hud", t: "Forest path", line: "Hold W: the path, the trees and the falls keep coming past the edge of the input view.", ins: [["First frame", ["in/manyou1_ff.jpg"]]], act: K("W") + " hold" },
-      { v: "roam2", t: "Ruins above the clouds", line: "Hold W and turn the camera right: the plateau, the ruins and the sea of clouds keep unfolding.", ins: [["First frame", ["in/manyou2_ff.jpg"]]], act: K("W") + "+ " + K("mouse →") } ] },
+      { v: "roam3", t: "Seaside meadow", line: "Hold W, then turn the camera left: past the lighthouse path, open grass and sea that were never in the input view.", ins: [["First frame", ["in/manyou3_ff.jpg"]]], act: K("W") + "+ " + K("mouse ←") },
+      { v: "roam4", t: "Graveyard road", line: "Hold W: the cracked road, the gravestones and the dead trees keep coming toward the knight.", ins: [["First frame", ["in/manyou4_ff.jpg"]]], act: K("W") + " hold" } ] },
     { t: "Summon", cases: [
       { v: "summon1", t: "Lava field", line: "One picture of a creature: it is rigged, given moves that fit its body, walks in from the haze and squares up to the knight.", ins: [["First frame", ["in/zhaohuan1_ff.jpg"]], ["Boss picture", ["in/zhaohuan1_ref.jpg"], true]], act: K("B") + " summon" },
       { v: "summon2", t: "Violet marsh", line: "The camera pans and the lich is already there, matching its picture.", ins: [["First frame", ["in/zhaohuan2_ff.jpg"]], ["Boss picture", ["in/zhaohuan2_ref.jpg"], true]], act: K("B") + " summon" } ] },
