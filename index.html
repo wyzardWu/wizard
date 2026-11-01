@@ -70,6 +70,9 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 22px; }
 .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); font: 500 .84rem/1 var(--sans); text-decoration: none; }
 .btn small { font-size: .72rem; color: var(--faint); }
+.btn.live { color: var(--ink); border-color: var(--slate); background: var(--card2); transition: background .2s, color .2s; }
+.btn.live:hover { background: var(--ink); color: var(--bg); }
+.btn.live:hover small { color: var(--mist-blue); }
 .film { margin: 36px auto 0; max-width: 920px; padding: 8px; }
 .film video { display: block; width: 100%; aspect-ratio: 16/9; border-radius: 7px; background: #1c262c; }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; max-width: 920px; margin: 14px auto 0; }
@@ -266,7 +269,7 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
     </div>
     <div class="btns">
       <span class="btn" aria-disabled="true">Paper <small>soon</small></span>
-      <span class="btn" aria-disabled="true">arXiv <small>soon</small></span>
+      <a class="btn live" href="https://arxiv.org/html/2610.40339" target="_blank" rel="noopener">arXiv <small>2610.40339</small></a>
       <span class="btn" aria-disabled="true">Code <small>soon</small></span>
     </div>
     <div class="film card"><video id="trailer" src="assets/v/trailer.mp4?v=13c" poster="assets/v/trailer.jpg?v=13c" controls playsinline preload="metadata"></video></div>
