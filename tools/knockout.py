@@ -1,16 +1,18 @@
 # Make the white that is connected to a figure's outer border transparent, with soft edges, then trim the margin.
-# Usage: python3 tools/knockout.py in.jpg out.webp
+# Usage: python3 tools/knockout.py in.jpg out.webp [white_threshold=250]
+# Keep the threshold high: pale panel tints (e.g. 243,246,251 in fig3) must survive.
 import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 src, dst = sys.argv[1], sys.argv[2]
+thr = int(sys.argv[3]) if len(sys.argv) > 3 else 250
 im = Image.open(src).convert("RGB")
 a = np.asarray(im).astype(np.float32)
 w, h = im.size
 
 # near-white pixels, padded with a white frame so one flood fill reaches every border pixel
-near = (a.min(axis=2) >= 236).astype(np.uint8) * 255
+near = (a.min(axis=2) >= thr).astype(np.uint8) * 255
 m = Image.new("L", (w + 2, h + 2), 255)
 m.paste(Image.fromarray(near), (1, 1))
 ImageDraw.floodfill(m, (0, 0), 128)
