@@ -236,9 +236,9 @@ figure { margin: 0; }
 .parts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
 @media (max-width: 1000px) { .parts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .parts { grid-template-columns: minmax(0, 1fr); } }
-.figrow { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 28px; margin-top: 64px; align-items: center; }
-.figrow .stack { display: grid; gap: 12px; }
-@media (max-width: 860px) { .figrow { grid-template-columns: minmax(0, 1fr); } }
+.figrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; margin-top: 64px; }
+.figrow .stack { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .figrow .stack { grid-template-columns: minmax(0, 1fr); } }
 .parts > div, .stack > div { padding: 16px 18px; }
 .parts h3, .stack h3 { font: 600 .95rem/1.3 var(--sans); margin-bottom: 6px; }
 .parts h3 small, .stack h3 small { color: var(--accent); margin-right: 8px; font: 500 .72rem var(--mono); }
@@ -310,7 +310,7 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
       <a class="btn live" href="https://arxiv.org/html/2610.40339" target="_blank" rel="noopener">arXiv <small>2610.40339</small></a>
       <span class="btn" aria-disabled="true">Code <small>soon</small></span>
     </div>
-    <div class="film"><video id="trailer" src="assets/v/trailer.mp4?v=13c" poster="assets/v/trailer.jpg?v=13c" controls playsinline preload="metadata"></video></div>
+    <div class="film"><video id="trailer" src="assets/v/trailer.mp4?v=14" poster="assets/v/trailer.jpg?v=13c" controls playsinline preload="metadata"></video></div>
   </div>
 </header>
 
@@ -318,7 +318,7 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
 <section id="overview">
   <div class="wrap">
     <div class="split"><div class="sh"><span class="kicker">Overview</span><h2><b>Change the world</b> as you play.</h2></div>
-    <p class="lead">Game world models can generate interactive video in real time, but a game needs more than walking around: a boss that appears and fights by its own rules, a creature that turns into another, ground that splits or rises on command. <b>Wizard</b> keeps the game state explicit: scene geometry for the world, an articulated skeleton for every character, and rules for the fight. Agents edit that state from one image, a typed instruction or a key press; a causal video model renders it at 24 FPS. Every scene and character on this page is new to the model.</p></div>
+    <p class="lead">Game world models can generate interactive video in real time, but a game needs more than walking around: a boss that appears and fights by its own rules, a creature that turns into another, ground that splits or rises on command. <b>Wizard</b> keeps the game state explicit: scene geometry for the world, an articulated skeleton for every character, and rules for the fight. Agents edit that state from one image, a typed instruction or a key press; a causal video model renders it at 20 FPS. Every scene and character on this page is new to the model.</p></div>
     <figure style="margin-top:26px"><a class="paper" href="assets/img/fig1.webp?v=2" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig1.webp?v=2" alt="Overview: world exploration, character summoning, character transformation and scene manipulation, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay." loading="lazy"></a>
       <figcaption class="figcap"><b>Figure 1.</b> Four ways to play, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay.</figcaption></figure>
   </div>
@@ -365,12 +365,13 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
       <div class="card"><h3><small>(a)</small>Character animation</h3><p>Qwen3-VL infers body structure; SAM2, TripoSG and UniRig give a labelled skeleton. Motions from CombatMotion, WildWorld and Elden Ring are retrieved by body structure and style, then retargeted limb chain by limb chain.</p></div>
       <div class="card"><h3><small>(b)</small>Scene manipulation</h3><p>MoGe-2 recovers geometry and camera. An OpenGL renderer draws the proxy, and Qwen3-VL-8B turns instructions into programs over geometric operators, from raising a platform to turning the world upside down.</p></div>
       <div class="card"><h3><small>(c)</small>State-aware combat</h3><p>The state tracks positions, poses, health, action phases and cooldowns. A planner simulates candidate attacks; a rule-based controller resolves hits, damage, reactions and knock-outs.</p></div>
-      <div class="card"><h3><small>(d)</small>Real-time generation</h3><p>Wan2.2-TI2V-5B renders the proxies conditioned on the first frame, one reference per character and the retained history, at 24 FPS with two denoising steps.</p></div>
+      <div class="card"><h3><small>(d)</small>Real-time generation with spatial memory</h3><p>Wan2.2-TI2V-5B renders the proxies conditioned on the scene image, one reference per character and up to three retrieved memory frames, at 20 FPS with two denoising steps. MapAnything lifts each generated chunk into a persistent 3D world cache.</p></div>
     </div>
     <div class="figrow">
-    <figure><a class="paper" href="assets/img/fig4.webp?v=3" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig4.webp?v=3" alt="Video generator architecture and character-aware adaptive masking." loading="lazy"></a><figcaption class="figcap"><b>Figure 3.</b> Generator and character-aware masking.</figcaption></figure>
+    <figure><a class="paper" href="assets/img/fig4.webp?v=3" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig4.webp?v=3" alt="Video generator architecture and character-aware adaptive masking." loading="lazy"></a><figcaption class="figcap"><b>Figure 3.</b> Generator with (a) character-aware adaptive masking and (b) world-anchored spatial conditioning.</figcaption></figure>
     <div class="stack">
       <div class="card"><h3><small>Masking</small>Character-aware adaptive masking</h3><p>Each reference may attend only to its own character's skeleton-derived region, expanded by 25%. The masks follow the characters and reduce appearance leakage; on a transformation they block the old identity's cached tokens while the background and first-frame sink stay visible.</p></div>
+      <div class="card"><h3><small>Memory</small>World-anchored spatial conditioning</h3><p>The agent keeps an explicit scene map as the player explores and projects it into the memory frames and the current proxy as per-pixel world coordinates, kept only where the scene has already been seen. Added to the memory and proxy–video tokens, they anchor past and present to one map: revisited places are re-rendered from the new view rather than copied (copy bias 6.61 → 2.84), while unexplored regions stay free to generate.</p></div>
       <div class="card"><h3><small>Speed</small>Causal adaptation and distillation</h3><p>Following Causal Forcing++: teacher forcing, consistency distillation with a 20-latent-frame window and a first-frame sink, then DMD on the student's own rollouts. Proxy conditions and gated references stay active throughout.</p></div>
     </div>
     </div>
