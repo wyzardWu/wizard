@@ -319,7 +319,7 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
   <div class="wrap">
     <div class="split"><div class="sh"><span class="kicker">Overview</span><h2><b>Change the world</b> as you play.</h2></div>
     <p class="lead">Game world models can generate interactive video in real time, but a game needs more than walking around: a boss that appears and fights by its own rules, a creature that turns into another, ground that splits or rises on command. <b>Wizard</b> keeps the game state explicit: scene geometry for the world, an articulated skeleton for every character, and rules for the fight. Agents edit that state from one image, a typed instruction or a key press; a causal video model renders it at 24 FPS. Every scene and character on this page is new to the model.</p></div>
-    <figure style="margin-top:26px"><a class="paper" href="assets/img/fig1.webp" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig1.webp" alt="Overview: world exploration, character summoning, character transformation and scene manipulation, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay." loading="lazy"></a>
+    <figure style="margin-top:26px"><a class="paper" href="assets/img/fig1.webp?v=2" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig1.webp?v=2" alt="Overview: world exploration, character summoning, character transformation and scene manipulation, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay." loading="lazy"></a>
       <figcaption class="figcap"><b>Figure 1.</b> Four ways to play, built on fine-grained control, zero-shot generalization and mechanics-consistent gameplay.</figcaption></figure>
   </div>
 </section>
@@ -360,7 +360,7 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
   <div class="wrap">
     <div class="split"><div class="sh"><span class="kicker">Method</span><h2><b>Agents</b> keep the state. <b>The model</b> paints it.</h2></div>
     <p class="lead">A setup stage of under five minutes reconstructs the scene and characters, rigs skeletons and builds each character's motion set. During play, the framework updates motion, geometry and combat state, and the generator renders them.</p></div>
-    <figure><a class="paper" href="assets/img/fig3.webp?v=3" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig3.webp?v=3" alt="Inference pipeline: (a) character animation, (b) scene manipulation, (c) state-aware combat control, (d) real-time video generation." loading="lazy"></a><figcaption class="figcap"><b>Figure 2.</b> Inference pipeline.</figcaption></figure>
+    <figure><a class="paper" href="assets/img/fig3.webp?v=4" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig3.webp?v=4" alt="Inference pipeline: (a) character animation, (b) scene manipulation, (c) state-aware combat control, (d) real-time video generation." loading="lazy"></a><figcaption class="figcap"><b>Figure 2.</b> Inference pipeline.</figcaption></figure>
     <div class="parts">
       <div class="card"><h3><small>(a)</small>Character animation</h3><p>Qwen3-VL infers body structure; SAM2, TripoSG and UniRig give a labelled skeleton. Motions from CombatMotion, WildWorld and Elden Ring are retrieved by body structure and style, then retargeted limb chain by limb chain.</p></div>
       <div class="card"><h3><small>(b)</small>Scene manipulation</h3><p>MoGe-2 recovers geometry and camera. An OpenGL renderer draws the proxy, and Qwen3-VL-8B turns instructions into programs over geometric operators, from raising a platform to turning the world upside down.</p></div>
@@ -368,7 +368,7 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
       <div class="card"><h3><small>(d)</small>Real-time generation</h3><p>Wan2.2-TI2V-5B renders the proxies conditioned on the first frame, one reference per character and the retained history, at 24 FPS with two denoising steps.</p></div>
     </div>
     <div class="figrow">
-    <figure><a class="paper" href="assets/img/fig4.webp?v=2" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig4.webp?v=2" alt="Video generator architecture and character-aware adaptive masking." loading="lazy"></a><figcaption class="figcap"><b>Figure 3.</b> Generator and character-aware masking.</figcaption></figure>
+    <figure><a class="paper" href="assets/img/fig4.webp?v=3" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig4.webp?v=3" alt="Video generator architecture and character-aware adaptive masking." loading="lazy"></a><figcaption class="figcap"><b>Figure 3.</b> Generator and character-aware masking.</figcaption></figure>
     <div class="stack">
       <div class="card"><h3><small>Masking</small>Character-aware adaptive masking</h3><p>Each reference may attend only to its own character's skeleton-derived region, expanded by 25%. The masks follow the characters and reduce appearance leakage; on a transformation they block the old identity's cached tokens while the background and first-frame sink stay visible.</p></div>
       <div class="card"><h3><small>Speed</small>Causal adaptation and distillation</h3><p>Following Causal Forcing++: teacher forcing, consistency distillation with a 20-latent-frame window and a first-frame sink, then DMD on the student's own rollouts. Proxy conditions and gated references stay active throughout.</p></div>
@@ -379,17 +379,17 @@ dialog.lb p { color: #dfe8ec; text-align: center; font-size: .88rem; margin-top:
 
 <section id="data">
   <div class="wrap">
-    <div class="sh"><span class="kicker">Data</span><h2><b>50.3 hours</b> of proxy–video pairs</h2><p>Four sources, each adding what the others lack: diverse creature bodies, controlled synthetic events, real game footage and exact scripted fights.</p></div>
-    <figure><a class="paper" href="assets/img/fig2.webp" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig2.webp" alt="Dataset overview and processing pipeline." loading="lazy"></a><figcaption class="figcap"><b>Figure 4.</b> Dataset overview and processing pipeline.</figcaption></figure>
+    <div class="sh"><span class="kicker">Data</span><h2><b>56.1 hours</b> of proxy–video pairs</h2><p>Four sources, each adding what the others lack: diverse creature bodies, controlled synthetic events, real game footage and exact scripted fights.</p></div>
+    <figure><a class="paper" href="assets/img/fig2.webp?v=2" target="_blank" rel="noopener" title="Open full size"><img src="assets/img/fig2.webp?v=2" alt="Dataset overview and processing pipeline." loading="lazy"></a><figcaption class="figcap"><b>Figure 4.</b> Dataset overview and processing pipeline.</figcaption></figure>
     <div class="tbl card">
       <table>
         <thead><tr><th>Source</th><th>Adds</th><th class="n">Hours</th></tr></thead>
         <tbody>
-          <tr><td>WildWorld</td><td>diverse creature bodies, with skeleton and depth</td><td class="n">26.6</td></tr>
-          <tr><td>Synthetic</td><td>162 characters, 742 scenes; entry, coexistence, re-appearance, rapid turns</td><td class="n">11.6</td></tr>
-          <tr><td>Elden Ring recordings</td><td>11 regions, 20+ outfits, six bosses</td><td class="n">8.8</td></tr>
+          <tr><td>Public datasets</td><td>WildWorld + SceneFly: diverse creature bodies and scenes, with skeleton and depth</td><td class="n">29.2</td></tr>
+          <tr><td>Gameplay recordings</td><td>Elden Ring: 11 regions, 20+ outfits, six bosses</td><td class="n">12.6</td></tr>
+          <tr><td>Synthetic</td><td>162 characters, 742 scenes; entry, coexistence, re-appearance, rapid turns</td><td class="n">11.0</td></tr>
           <tr><td>UE simulations</td><td>scripted boss fights with exact proxies</td><td class="n">3.3</td></tr>
-          <tr><td>Total</td><td>750 scenes · 178 characters</td><td class="n">50.3</td></tr>
+          <tr><td>Total</td><td>805 scenes · 178 characters</td><td class="n">56.1</td></tr>
         </tbody>
       </table>
     </div>
